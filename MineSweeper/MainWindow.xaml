@@ -1,0 +1,55 @@
+﻿<Window x:Class="MineSweeper.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MineSweeper"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="new">
+                <MenuItem Header="1"/>
+                <MenuItem Header="2"/>
+                <MenuItem Header="3"/>
+            </MenuItem>
+            <MenuItem Header="test">
+                <MenuItem Header="no"/>
+                <MenuItem Header="yes"/>
+            </MenuItem>
+        </Menu>
+        <Grid DockPanel.Dock="Top" >
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0">
+                Mines Left
+            </TextBlock>
+            <Button Grid.Column="1">
+                New
+            </Button>
+            <TextBlock Grid.Column="2">
+                Time
+            </TextBlock>
+        </Grid>
+
+
+        <ItemsControl ItemsSource="{Binding  Mines}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="{Binding Col}" Rows="{Binding Row}"  />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+        </ItemsControl>
+
+    </DockPanel>
+</Window>
