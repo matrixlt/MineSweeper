@@ -109,8 +109,26 @@ namespace MineSweeper
             throw new Exception();
         }
 
-        public void Restart()
+        public void Restart()                           //much more things to do
         {
+            in_game = false;
+            first_click = true;
+
+            foreach (Rectangle r in mines_set)
+            {
+                r.Fill = Brushes.AliceBlue;
+            }
+
+            game = new Game();
+            number_show = game.Generate(row, col, 5);
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    Mine mymine = new Mine(game.GetMineCount(i, j));
+                    mines[i, j] = mymine;
+                }
+            }
 
         }
     }
