@@ -9,7 +9,6 @@ namespace MineSweeper
 {
     public class Mine
     {
-        public Rectangle graph = new Rectangle();
         public int mine_count;
         public bool is_flag;
         public bool is_cover;

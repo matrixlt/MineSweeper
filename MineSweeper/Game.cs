@@ -112,5 +112,20 @@ namespace MineSweeper
                 return distribution[i, j];
             }
         }
+
+        public bool IsFinish(Mine[,] mines)// can be opt
+        {
+            for(int i = 0;i < row; i++)
+            {
+                for(int j = 0; j < col; j++)
+                {
+                    if(distribution[i,j] == 0 && mines[i,j].is_cover)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
     }
 }
