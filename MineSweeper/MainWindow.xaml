@@ -42,7 +42,7 @@
         </Grid>
 
 
-        <ItemsControl ItemsSource="{Binding  Mines}">
+        <ItemsControl ItemsSource="{Binding MinesSet}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Columns="{Binding Col}" Rows="{Binding Row}"  />

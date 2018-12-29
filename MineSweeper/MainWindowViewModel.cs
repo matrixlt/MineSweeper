@@ -14,22 +14,27 @@ namespace MineSweeper
         private bool in_game;
         private int row;
         private int col;
-        List<Rectangle> mines = new List<Rectangle> { };
-        Mine[,] game = null;
+        List<Rectangle> mines_set = new List<Rectangle> { };
+        Mine[,] mines = null;
+        int[,] number_show = null;
+        NumberBrush myBrush = new NumberBrush();
+
+        Game game = new Game();
 
         public MainWindowViewModel()
         {
             this.row = 20;
             this.col = 20;
-            game = new Mine[row, col];
+            mines = new Mine[row, col];
+            number_show =  game.Generate(row, col, 100);
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
                 {
-                    Mine mymine = new Mine();
+                    Mine mymine = new Mine(game.GetMineCount(i,j));
                     Rectangle mine = mymine.graph;
-                    game[i, j] = mymine;
-                    mines.Add(mine);
+                    mines[i, j] = mymine;
+                    mines_set.Add(mine);
                     mine.Fill = Brushes.AliceBlue;
                     mine.MouseLeftButtonUp += new MouseButtonEventHandler(click);
                 }
@@ -40,14 +45,28 @@ namespace MineSweeper
         {
             Console.WriteLine(sender.ToString());
             Rectangle s = (Rectangle)sender;
-            if (s.Fill != System.Windows.Media.Brushes.SkyBlue)
-                s.Fill = System.Windows.Media.Brushes.SkyBlue;
-            else
-                s.Fill = System.Windows.Media.Brushes.Brown;
-
+            Mine mine = WhichMine(s);
+            Console.WriteLine(mine.mine_count);
+            if(mine.mine_count > 0)
+                s.Fill = NumberBrush.numbers[mine.mine_count];
+            
         }
+
         public int Row { get; set; }
         public int Col { get; set; }
-        public List<Rectangle> Mines { get { return mines; } }
+        public List<Rectangle> MinesSet { get { return mines_set; } }
+
+        public Mine WhichMine(Rectangle r)
+        {
+            for(int i = 0; i < mines_set.Count; i++)
+            {
+                if (Object.ReferenceEquals(r, mines_set[i]))
+                {
+                    return mines[i / row, i % row];
+                }
+            }
+
+            throw new Exception();
+        }
     }
 }

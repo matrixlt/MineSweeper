@@ -11,16 +11,25 @@ namespace MineSweeper
     {
         public Rectangle graph = new Rectangle();
         public int mine_count;
-        public int state;
+        public bool is_flag;
+        public bool is_cover;
+        public bool is_mine;
 
-        public Mine()
+        public Mine(int count)
         {
+            mine_count = count;
+            is_cover = true;
+            is_flag = false;
+            if(count == -1)
+            {
+                is_mine = true;
+            }
+            else
+            {
+                is_mine = false;
+            }
 
         }
 
-        public Mine(int state)
-        {
-            this.state = state;
-        }
     }
 }
