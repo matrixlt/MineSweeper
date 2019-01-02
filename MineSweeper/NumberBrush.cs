@@ -28,7 +28,8 @@ namespace MineSweeper
                 someText.FontSize = (double)fSizeConverter.ConvertFromString("10pt");
                 someText.Margin = new Thickness(10);
                 someText.Foreground = new SolidColorBrush(colors[i]);
-                aPanel.Children.Add(someText);
+                if(i!=0)
+                    aPanel.Children.Add(someText);
                 my_brush.Visual = aPanel;
                 numbers.Add(my_brush);
             }

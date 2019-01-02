@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="500" Width="450" ResizeMode="NoResize">
     <Window.DataContext>
         <local:MainWindowViewModel/>
     </Window.DataContext>
@@ -42,13 +42,12 @@
         </Grid>
 
 
-        <ItemsControl ItemsSource="{Binding MinesSet}">
+        <ItemsControl ItemsSource="{Binding BorderSet}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="{Binding Col}" Rows="{Binding Row}"  />
+                    <UniformGrid Columns="{Binding Col}" Rows="{Binding Row}"  Height="350" Width="350"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-
         </ItemsControl>
 
     </DockPanel>
