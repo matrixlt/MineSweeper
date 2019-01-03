@@ -22,9 +22,9 @@ namespace MineSweeper
         public BlockBrush()
         {
             flag = new ImageBrush();
-            flag.ImageSource = new BitmapImage(new Uri(@"image\flag.png", UriKind.Relative));
+            flag.ImageSource = new BitmapImage(new Uri("pack://application:,,,/image/flag.png"));
             mine = new ImageBrush();
-            mine.ImageSource = new BitmapImage(new Uri(@"image\mine.png", UriKind.Relative));
+            mine.ImageSource = new BitmapImage(new Uri("pack://application:,,,/image/mine.png"));
             for (int i = 0; i < 9; i++)
             {
                 var my_brush = new VisualBrush();
