@@ -6,19 +6,26 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace MineSweeper
 {
-    class NumberBrush
+    class BlockBrush
     {
         static public List<VisualBrush> numbers = new List<VisualBrush> { };
         static public List<Color> colors = new List<Color> { Colors.White,
                                                              Colors.Blue,Colors.Green,Colors.Red,
                                                              Colors.Navy,Colors.Brown,Colors.DarkSeaGreen,
                                                              Colors.Black,Colors.Gray};
-        public NumberBrush()
+        static public ImageBrush flag;
+        static public ImageBrush mine;
+        public BlockBrush()
         {
-            for(int i = 0; i < 9; i++)
+            flag = new ImageBrush();
+            flag.ImageSource = new BitmapImage(new Uri(@"image\flag.png", UriKind.Relative));
+            mine = new ImageBrush();
+            mine.ImageSource = new BitmapImage(new Uri(@"image\mine.png", UriKind.Relative));
+            for (int i = 0; i < 9; i++)
             {
                 var my_brush = new VisualBrush();
                 StackPanel aPanel = new StackPanel();
