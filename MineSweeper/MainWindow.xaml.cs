@@ -20,9 +20,17 @@ namespace MineSweeper
     /// </summary>
     public partial class MainWindow : Window
     {
+        MainWindowViewModel VM;
         public MainWindow()
         {
             InitializeComponent();
+            VM = new MainWindowViewModel();
+            DataContext = VM;
+        }
+
+        private void Restart_Click(object sender, RoutedEventArgs e)//maybe should be in other place
+        {
+            VM.Restart();
         }
     }
 }
