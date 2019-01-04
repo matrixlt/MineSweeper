@@ -124,7 +124,6 @@ namespace MineSweeper
                 {
                     dispatcherTimer.Stop();
                     total_time = 0;
-                    this.Show_time = "000";
                     LoseWindow();
                     Restart();
                 }
@@ -133,7 +132,6 @@ namespace MineSweeper
                 {
                     dispatcherTimer.Stop();
                     total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
-                    this.Show_time = "000";
                     WinWindow();
                     Restart();
                 }
@@ -225,7 +223,6 @@ namespace MineSweeper
                     borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
                     dispatcherTimer.Stop();
                     total_time = 0;
-                    this.Show_time = "000";
                     LoseWindow();
                     Restart();
                 }
@@ -248,7 +245,6 @@ namespace MineSweeper
             {
                 dispatcherTimer.Stop();
                 total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
-                this.Show_time = "000";
                 WinWindow();
                 Restart();
             }
@@ -372,7 +368,6 @@ namespace MineSweeper
             first_interval = true;
 
             dispatcherTimer.Stop();
-            total_time = 0;
             this.Show_time = "000";
 
             foreach (Rectangle r in rectangles)
@@ -416,9 +411,6 @@ namespace MineSweeper
             OpenBlock(x, y);
             if (game.IsFinish(mines))
             {
-                dispatcherTimer.Stop();
-                total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
-                this.Show_time = "000";
                 WinWindow();
                 Restart();
             }
