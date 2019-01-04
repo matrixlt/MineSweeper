@@ -15,6 +15,7 @@ namespace MineSweeper
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        #region private members
         private bool in_game = false;
         private bool first_click = true;
 
@@ -26,7 +27,10 @@ namespace MineSweeper
         private DateTime start_time;
         private double time_span;
         private string show_time = "000";
+        #endregion
+        //only used in class
 
+        #region other member
         public event PropertyChangedEventHandler PropertyChanged;
 
         List<Rectangle> mines_set = new List<Rectangle> { };
@@ -38,6 +42,11 @@ namespace MineSweeper
 
         Game game = new Game();
 
+        public delegate bool AutoPlay(int x, int y);
+        #endregion
+        //maybe used out of class
+
+        #region constructor
         public MainWindowViewModel()
         {
             this.row = 10;
@@ -71,7 +80,9 @@ namespace MineSweeper
                 }
             }
         }
+        #endregion
 
+        #region mouse event
         private void MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (both_down)
@@ -139,42 +150,6 @@ namespace MineSweeper
                 both_down = true;
             }
 
-        }
-
-        private void OpenBlock(int x, int y)
-        {
-            if (!mines[x, y].is_mine)
-                rectangles[x, y].Fill = BlockBrush.numbers[mines[x, y].mine_count];
-            else
-            {
-                rectangles[x, y].Fill = BlockBrush.mine;
-                borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
-            }
-            mines[x, y].is_cover = false;
-
-        }
-
-        private void OpenEmpty(int x, int y)
-        {
-            OpenBlock(x, y);
-
-            for (int i = x - 1; i < x + 2; i++)
-            {
-                for (int j = y - 1; j < y + 2; j++)
-                {
-                    if (InBorder(i, j))
-                    {
-                        if (mines[i, j].mine_count == 0 && mines[i, j].is_cover)
-                        {
-                            OpenEmpty(i, j);
-                        }
-                        else
-                        {
-                            OpenBlock(i, j);
-                        }
-                    }
-                }
-            }
         }
 
         private void LClick(object sender, MouseButtonEventArgs e)
@@ -257,6 +232,43 @@ namespace MineSweeper
                 {
                     mine.is_flag = true;
                     s.Fill = BlockBrush.flag;
+                }
+            }
+        }
+        #endregion
+
+        private void OpenBlock(int x, int y)
+        {
+            if (!mines[x, y].is_mine)
+                rectangles[x, y].Fill = BlockBrush.numbers[mines[x, y].mine_count];
+            else
+            {
+                rectangles[x, y].Fill = BlockBrush.mine;
+                borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
+            }
+            mines[x, y].is_cover = false;
+
+        }
+
+        private void OpenEmpty(int x, int y)
+        {
+            OpenBlock(x, y);
+
+            for (int i = x - 1; i < x + 2; i++)
+            {
+                for (int j = y - 1; j < y + 2; j++)
+                {
+                    if (InBorder(i, j))
+                    {
+                        if (mines[i, j].mine_count == 0 && mines[i, j].is_cover)
+                        {
+                            OpenEmpty(i, j);
+                        }
+                        else
+                        {
+                            OpenBlock(i, j);
+                        }
+                    }
                 }
             }
         }
@@ -397,5 +409,54 @@ namespace MineSweeper
                 Restart();
             }
         }
+
+        #region AutoPlay
+        public void SimpleTest(AutoPlay f)
+        {
+            for(int i = 0; i < row; i++)
+            {
+                for(int j = 0; j < col; j++)
+                {
+                    f(i, j);
+                }
+            }
+        }
+
+        public bool SimpleFlag(int x, int y)
+        {
+            int flag_count = 0;
+            int unflag_count = 0;
+            for(int i = x - 1; i < x + 2; i++)
+            {
+                for(int j = y - 1; j < y + 2; j++)
+                {
+                    if(InBorder(i,j) && mines[i, j].is_cover)
+                    {
+                        if (mines[i, j].is_flag)
+                            flag_count++;
+                        else unflag_count++;
+                    }
+                }
+            }
+
+            if(unflag_count + flag_count == mines[x, y].mine_count)
+            {
+                for (int i = x - 1; i < x + 2; i++)
+                {
+                    for (int j = y - 1; j < y + 2; j++)
+                    {
+                        if (InBorder(i, j) && mines[i, j].is_cover)
+                        {
+                            mines[i, j].is_flag = true;
+                            rectangles[i, j].Fill = BlockBrush.flag;
+                        }
+                    }
+                }
+                if (unflag_count > 0)
+                    return true;
+            }
+            return false;
+        }
+        #endregion
     }
 }

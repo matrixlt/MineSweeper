@@ -32,5 +32,10 @@ namespace MineSweeper
         {
             VM.Restart();
         }
+
+        private void SimpleFlag(object sender, RoutedEventArgs e)
+        {
+            VM.SimpleTest(VM.SimpleFlag);
+        }
     }
 }
