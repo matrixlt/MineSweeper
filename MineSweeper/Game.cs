@@ -16,7 +16,7 @@ namespace MineSweeper
         public int col;
         public int mine_number;
 
-        public int [,] distribution = null;
+        public int[,] distribution = null;
 
 
         public Game()
@@ -50,7 +50,7 @@ namespace MineSweeper
             int[] temp = new int[row * col];
             distribution = new int[row, col];
 
-            for(int i = 0; i < row * col; i++)
+            for (int i = 0; i < row * col; i++)
             {
                 if (i < mine_number)
                 {
@@ -64,9 +64,9 @@ namespace MineSweeper
 
             Shuffle(temp);
 
-            for(int i = 0; i < row; i++)
+            for (int i = 0; i < row; i++)
             {
-                for(int j = 0; j < col; j++)
+                for (int j = 0; j < col; j++)
                 {
                     distribution[i, j] = temp[i * row + j];
                 }
@@ -75,14 +75,14 @@ namespace MineSweeper
             return distribution;
         }
 
-        public int GetMineCount(int i,int j)
+        public int GetMineCount(int i, int j)
         {
-            if(i < 0 || i >= row || j <0 || j >= col)
+            if (i < 0 || i >= row || j < 0 || j >= col)
             {
                 throw new Exception();
             }
 
-            if(distribution[i,j] == 1)
+            if (distribution[i, j] == 1)
             {
                 return -1; //is mine
             }
@@ -90,9 +90,9 @@ namespace MineSweeper
             else//not mine
             {
                 int count = 0;
-                for(int m = i - 1; m < i + 2; m++)
+                for (int m = i - 1; m < i + 2; m++)
                 {
-                    for(int n = j - 1; n < j + 2; n++)
+                    for (int n = j - 1; n < j + 2; n++)
                     {
                         count += IsMine(m, n);
                     }
@@ -101,9 +101,9 @@ namespace MineSweeper
             }
         }
 
-        public int IsMine(int i,int j)
+        public int IsMine(int i, int j)
         {
-            if(i < 0 || i >= row || j < 0 || j >= col)
+            if (i < 0 || i >= row || j < 0 || j >= col)
             {
                 return 0;
             }
@@ -115,11 +115,11 @@ namespace MineSweeper
 
         public bool IsFinish(Mine[,] mines)// can be opt
         {
-            for(int i = 0;i < row; i++)
+            for (int i = 0; i < row; i++)
             {
-                for(int j = 0; j < col; j++)
+                for (int j = 0; j < col; j++)
                 {
-                    if(distribution[i,j] == 0 && mines[i,j].is_cover)
+                    if (distribution[i, j] == 0 && mines[i, j].is_cover)
                     {
                         return false;
                     }
