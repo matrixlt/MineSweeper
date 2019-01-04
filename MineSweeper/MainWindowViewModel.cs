@@ -108,36 +108,7 @@ namespace MineSweeper
                 if (flag_count != mine.mine_count)
                     return;
 
-                bool lose = false;
-                for (int i = x - 1; i < x + 2; i++)
-                {
-                    for (int j = y - 1; j < y + 2; j++)
-                    {
-                        if (InBorder(i, j) && !mines[i, j].is_flag)
-                        {
-                            if (mines[i, j].mine_count == 0)
-                                OpenEmpty(i, j);
-                            else OpenBlock(i, j);
-                            if (mines[i, j].is_mine)
-                            {
-                                lose = true;
-                            }
-                        }
-
-                    }
-                }
-
-                if (lose)
-                {
-                    LoseWindow();
-                    Restart();
-                }
-
-                if (game.IsFinish(mines))
-                {
-                    WinWindow();
-                    Restart();
-                }
+                LRClick(x,y);
 
             }
             both_down = false;
@@ -270,6 +241,40 @@ namespace MineSweeper
                         }
                     }
                 }
+            }
+        }
+
+        private void LRClick(int x, int y)
+        {
+            bool lose = false;
+            for (int i = x - 1; i < x + 2; i++)
+            {
+                for (int j = y - 1; j < y + 2; j++)
+                {
+                    if (InBorder(i, j) && !mines[i, j].is_flag)
+                    {
+                        if (mines[i, j].mine_count == 0)
+                            OpenEmpty(i, j);
+                        else OpenBlock(i, j);
+                        if (mines[i, j].is_mine)
+                        {
+                            lose = true;
+                        }
+                    }
+
+                }
+            }
+
+            if (lose)
+            {
+                LoseWindow();
+                Restart();
+            }
+
+            if (game.IsFinish(mines))
+            {
+                WinWindow();
+                Restart();
             }
         }
 
@@ -417,7 +422,8 @@ namespace MineSweeper
             {
                 for(int j = 0; j < col; j++)
                 {
-                    f(i, j);
+                    if(!mines[i,j].is_cover)
+                        f(i, j);
                 }
             }
         }
@@ -453,6 +459,32 @@ namespace MineSweeper
                     }
                 }
                 if (unflag_count > 0)
+                    return true;
+            }
+            return false;
+        }
+
+        public bool SimpleClick(int x, int y)
+        {
+            int flag_count = 0;
+            int unflag_count = 0;
+            for (int i = x - 1; i < x + 2; i++)
+            {
+                for (int j = y - 1; j < y + 2; j++)
+                {
+                    if (InBorder(i, j) && mines[i, j].is_cover)
+                    {
+                        if (mines[i, j].is_flag)
+                            flag_count++;
+                        else unflag_count++;
+                    }
+                }
+            }
+
+            if(flag_count == mines[x, y].mine_count)
+            {
+                LRClick(x, y);
+                if (unflag_count != 0)
                     return true;
             }
             return false;

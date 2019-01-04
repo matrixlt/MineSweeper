@@ -11,7 +11,7 @@
             <MenuItem Header="new">
                 <MenuItem Header="Restart" Click="Restart_Click"/>
                 <MenuItem Header="SimpleFlag" Click="SimpleFlag"/>
-                <MenuItem Header="3"/>
+                <MenuItem Header="SimpleClick" Click="SimpleClick"/>
             </MenuItem>
             <MenuItem Header="test">
                 <MenuItem Header="no"/>

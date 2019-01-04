@@ -37,5 +37,10 @@ namespace MineSweeper
         {
             VM.SimpleTest(VM.SimpleFlag);
         }
+
+        private void SimpleClick(object sender, RoutedEventArgs e)
+        {
+            VM.SimpleTest(VM.SimpleClick);
+        }
     }
 }
