@@ -275,7 +275,7 @@ namespace MineSweeper
             }
             else
             {
-                time_span = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                time_span = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000 + 1;
                 if (time_span > 999)
                 {
                     this.Show_time = Convert.ToInt64(time_span - 1000).ToString("D3");
