@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +9,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace MineSweeper
 {
-    public class MainWindowViewModel
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
         private bool in_game = false;
         private bool first_click = true;
@@ -21,6 +23,13 @@ namespace MineSweeper
         private int mine_number;
         private bool both_down = false;
 
+        private DateTime start_time;
+        private double time_span;
+        private string show_time = "000";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        List<Rectangle> mines_set = new List<Rectangle> { };
         List<Border> borders = new List<Border> { };
         Mine[,] mines = null;
         int[,] number_show = null;
@@ -36,12 +45,12 @@ namespace MineSweeper
             this.mine_number = 15;
             mines = new Mine[row, col];
             rectangles = new Rectangle[row, col];
-            number_show =  game.Generate(row, col, mine_number);
+            number_show = game.Generate(row, col, mine_number);
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
                 {
-                    Mine mymine = new Mine(game.GetMineCount(i,j));
+                    Mine mymine = new Mine(game.GetMineCount(i, j));
                     Rectangle myrectangle = new Rectangle();
 
                     Border border = new Border();
@@ -58,7 +67,7 @@ namespace MineSweeper
                     myrectangle.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LClick);
                     myrectangle.PreviewMouseDown += new MouseButtonEventHandler(MouseDown);
                     myrectangle.PreviewMouseUp += new MouseButtonEventHandler(MouseUp);
-                    
+
                 }
             }
         }
@@ -74,9 +83,9 @@ namespace MineSweeper
                     return;
 
                 int flag_count = 0;
-                for(int i = x - 1; i < x+2; i++)
+                for (int i = x - 1; i < x + 2; i++)
                 {
-                    for(int j = y - 1; j < y + 2; j++)
+                    for (int j = y - 1; j < y + 2; j++)
                     {
                         if (InBorder(i, j) && mines[i, j].is_flag)
                         {
@@ -93,9 +102,9 @@ namespace MineSweeper
                 {
                     for (int j = y - 1; j < y + 2; j++)
                     {
-                        if (InBorder(i,j) && !mines[i, j].is_flag)
+                        if (InBorder(i, j) && !mines[i, j].is_flag)
                         {
-                            if (mines[i,j].mine_count == 0)
+                            if (mines[i, j].mine_count == 0)
                                 OpenEmpty(i, j);
                             else OpenBlock(i, j);
                             if (mines[i, j].is_mine)
@@ -103,11 +112,11 @@ namespace MineSweeper
                                 lose = true;
                             }
                         }
-                        
+
                     }
                 }
 
-                if(lose)
+                if (lose)
                 {
                     LoseWindow();
                     Restart();
@@ -125,11 +134,11 @@ namespace MineSweeper
 
         private void MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if(e.LeftButton == MouseButtonState.Pressed && e.RightButton == MouseButtonState.Pressed)
+            if (e.LeftButton == MouseButtonState.Pressed && e.RightButton == MouseButtonState.Pressed)
             {
                 both_down = true;
             }
-            
+
         }
 
         private void OpenBlock(int x, int y)
@@ -137,7 +146,7 @@ namespace MineSweeper
             if (!mines[x, y].is_mine)
                 rectangles[x, y].Fill = BlockBrush.numbers[mines[x, y].mine_count];
             else
-            { 
+            {
                 rectangles[x, y].Fill = BlockBrush.mine;
                 borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
             }
@@ -151,11 +160,11 @@ namespace MineSweeper
 
             for (int i = x - 1; i < x + 2; i++)
             {
-                for(int j = y - 1; j < y + 2; j++)
+                for (int j = y - 1; j < y + 2; j++)
                 {
-                    if (InBorder(i,j))
+                    if (InBorder(i, j))
                     {
-                        if(mines[i,j].mine_count == 0 && mines[i,j].is_cover)
+                        if (mines[i, j].mine_count == 0 && mines[i, j].is_cover)
                         {
                             OpenEmpty(i, j);
                         }
@@ -170,12 +179,12 @@ namespace MineSweeper
 
         private void LClick(object sender, MouseButtonEventArgs e)
         {
-            
+
 
             Rectangle s = (Rectangle)sender;
             int x, y;                                     //position
-            Mine mine = WhichMine(s,out x, out y);       //FIX LATER
-            
+            Mine mine = WhichMine(s, out x, out y);       //FIX LATER
+
             Console.WriteLine(sender.ToString());
             Console.WriteLine(mine.mine_count);
 
@@ -185,13 +194,17 @@ namespace MineSweeper
             if (first_click)
             {                                       //TODO start a game or modify sth ,start the timer or sth
                 in_game = true;
-                first_click = false;
+                //first_click = false;
+                DispatcherTimer dispatcherTimer = new DispatcherTimer();
+                dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                dispatcherTimer.Start();
                 if (mine.is_mine)
                 {
                     Restart(x, y);
                     return;
                 }
-                       
+
             }
 
             if (mine.is_cover)
@@ -206,8 +219,8 @@ namespace MineSweeper
                 }
                 else
                 {
-                    
-                    if(mine.mine_count == 0)
+
+                    if (mine.mine_count == 0)
                     {
                         OpenEmpty(x, y);
                     }
@@ -215,7 +228,7 @@ namespace MineSweeper
                     {
                         OpenBlock(x, y);
                     }
-                    
+
                 }
             }
 
@@ -224,7 +237,7 @@ namespace MineSweeper
                 WinWindow();
                 Restart();
             }
-            
+
         }
 
         private void RClick(object sender, MouseButtonEventArgs e)
@@ -247,16 +260,58 @@ namespace MineSweeper
                 }
             }
         }
-        
+
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            if (first_click == true)
+            {
+                first_click = false;
+                start_time = DateTime.Now;
+                time_span = 0;
+                this.Show_time = Convert.ToInt64(time_span).ToString("D3");
+            }
+            else
+            {
+                time_span = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                if (time_span > 999)
+                {
+                    this.Show_time = Convert.ToInt64(time_span - 1000).ToString("D3");
+                }
+                else
+                {
+                    this.Show_time = Convert.ToInt64(time_span).ToString("D3");
+                }
+                Console.WriteLine(show_time);
+            }
+        }
+
+        protected void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
         public int Row { get; set; }
         public int Col { get; set; }
         public List<Border> BorderSet { get { return borders; } }
+        public string Show_time
+        {
+            get => show_time;
+            set
+            {
+                show_time = value;
+                OnPropertyChanged("Show_time");
+            }
+        }
 
         public Mine WhichMine(Rectangle r, out int x, out int y)
         {
-            for(int i = 0; i < row; i++)
+            for (int i = 0; i < row; i++)
             {
-                for(int j = 0; j < col; j++)
+                for (int j = 0; j < col; j++)
                 {
                     if (Object.ReferenceEquals(r, rectangles[i, j]))
                     {
@@ -301,7 +356,7 @@ namespace MineSweeper
             {
                 r.Fill = Brushes.AliceBlue;
             }
-            foreach(Border b in borders)
+            foreach (Border b in borders)
             {
                 b.Background = new SolidColorBrush(Colors.Tan);
             }
@@ -321,7 +376,7 @@ namespace MineSweeper
 
         public void Restart(int x, int y)               //opt needed
         {
-            while(game.GetMineCount(x,y) == -1)
+            while (game.GetMineCount(x, y) == -1)
             {
                 game = new Game();
                 number_show = game.Generate(row, col, mine_number);

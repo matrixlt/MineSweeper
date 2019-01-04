@@ -33,9 +33,7 @@
             <Button Grid.Column="1">
                 New
             </Button>
-            <TextBlock Grid.Column="2">
-                Time
-            </TextBlock>
+            <TextBlock Grid.Column="2"  Foreground="Red" Text="{Binding Path=Show_time, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" />
         </Grid>
 
 
