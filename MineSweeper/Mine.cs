@@ -19,7 +19,8 @@ namespace MineSweeper
             mine_count = count;
             is_cover = true;
             is_flag = false;
-            if(count == -1)
+
+            if(count == -1)             //-1 is mine
             {
                 is_mine = true;
             }

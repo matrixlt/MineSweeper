@@ -6,13 +6,10 @@
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="450" ResizeMode="NoResize">
-    <Window.DataContext>
-        <local:MainWindowViewModel/>
-    </Window.DataContext>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="new">
-                <MenuItem Header="1"/>
+                <MenuItem Header="Restart" Click="Restart_Click"/>
                 <MenuItem Header="2"/>
                 <MenuItem Header="3"/>
             </MenuItem>
