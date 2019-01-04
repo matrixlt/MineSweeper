@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +9,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace MineSweeper
 {
-    public class MainWindowViewModel
+    public class MainWindowViewModel : INotifyPropertyChanged
     {
         private bool in_game = false;
         private bool first_click = true;
@@ -19,6 +21,12 @@ namespace MineSweeper
         private int row;
         private int col;
         private int mine_number;
+
+        private double start_time;
+        private double time_span = 0;
+        private string show_time = "000";
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         List<Rectangle> mines_set = new List<Rectangle> { };
         List<Border> borders = new List<Border> { };
@@ -100,7 +108,11 @@ namespace MineSweeper
             if (first_click)
             {                                       //TODO start a game or modify sth ,start the timer or sth
                 in_game = true;
-                first_click = false;
+                //first_click = false;
+                DispatcherTimer dispatcherTimer = new DispatcherTimer();
+                dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                dispatcherTimer.Start();
                 if (mine.is_mine)
                 {
                     Restart(x, y);
@@ -140,10 +152,39 @@ namespace MineSweeper
             
         }
 
+        private void dispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            if (first_click == true)
+            {
+                first_click = false;
+                start_time = 0.001 * DateTime.Now.Millisecond + DateTime.Now.Second;
+                time_span = 0;
+                show_time = Convert.ToInt64(time_span).ToString("D3");
+                OnPropertyChanged("Show_name");
+            }
+            else
+            {
+                time_span = 0.01 * DateTime.Now.Millisecond + DateTime.Now.Second - start_time;
+                show_time = Convert.ToInt64(time_span).ToString("D3");
+                OnPropertyChanged("Show_name");
+                Console.WriteLine(show_time);
+            }
+        }
+
+        protected void OnPropertyChanged(string show_time)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(show_time));
+            }
+        }
+
         public int Row { get; set; }
         public int Col { get; set; }
         public List<Rectangle> MinesSet { get { return mines_set; } }
         public List<Border> BorderSet { get { return borders; } }
+        public string Show_time { get => show_time; }
 
         public Mine WhichMine(Rectangle r, out int x, out int y)
         {

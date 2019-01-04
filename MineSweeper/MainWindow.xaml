@@ -37,7 +37,7 @@
                 New
             </Button>
             <TextBlock Grid.Column="2">
-                Time
+                <TextBlock  Foreground="Red" Text="{Binding Path=Show_time, Mode=OneWay, NotifyOnSourceUpdated=True}" SourceUpdated="OnPropertyChanged" />
             </TextBlock>
         </Grid>
 
