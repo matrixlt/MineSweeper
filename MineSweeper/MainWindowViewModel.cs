@@ -123,7 +123,8 @@ namespace MineSweeper
                 if (lose)
                 {
                     dispatcherTimer.Stop();
-                    total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                    total_time = 0;
+                    this.Show_time = "000";
                     LoseWindow();
                     Restart();
                 }
@@ -132,6 +133,7 @@ namespace MineSweeper
                 {
                     dispatcherTimer.Stop();
                     total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                    this.Show_time = "000";
                     WinWindow();
                     Restart();
                 }
@@ -222,7 +224,8 @@ namespace MineSweeper
                     s.Fill = BlockBrush.mine;
                     borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
                     dispatcherTimer.Stop();
-                    total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                    total_time = 0;
+                    this.Show_time = "000";
                     LoseWindow();
                     Restart();
                 }
@@ -245,6 +248,7 @@ namespace MineSweeper
             {
                 dispatcherTimer.Stop();
                 total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                this.Show_time = "000";
                 WinWindow();
                 Restart();
             }
@@ -367,6 +371,10 @@ namespace MineSweeper
             first_click = true;
             first_interval = true;
 
+            dispatcherTimer.Stop();
+            total_time = 0;
+            this.Show_time = "000";
+
             foreach (Rectangle r in rectangles)
             {
                 r.Fill = Brushes.AliceBlue;
@@ -410,6 +418,7 @@ namespace MineSweeper
             {
                 dispatcherTimer.Stop();
                 total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                this.Show_time = "000";
                 WinWindow();
                 Restart();
             }
