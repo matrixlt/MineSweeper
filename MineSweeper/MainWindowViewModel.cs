@@ -26,6 +26,7 @@ namespace MineSweeper
         private DateTime start_time;
         private double time_span;
         private string show_time = "000";
+        private DispatcherTimer dispatcherTimer = new DispatcherTimer();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -118,12 +119,14 @@ namespace MineSweeper
 
                 if (lose)
                 {
+                    dispatcherTimer.Stop();
                     LoseWindow();
                     Restart();
                 }
 
                 if (game.IsFinish(mines))
                 {
+                    dispatcherTimer.Stop();
                     WinWindow();
                     Restart();
                 }
@@ -194,8 +197,6 @@ namespace MineSweeper
             if (first_click)
             {                                       //TODO start a game or modify sth ,start the timer or sth
                 in_game = true;
-                //first_click = false;
-                DispatcherTimer dispatcherTimer = new DispatcherTimer();
                 dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
                 dispatcherTimer.Start();
@@ -214,6 +215,7 @@ namespace MineSweeper
                     in_game = false;
                     s.Fill = BlockBrush.mine;
                     borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
+                    dispatcherTimer.Stop();
                     LoseWindow();
                     Restart();
                 }
@@ -234,6 +236,7 @@ namespace MineSweeper
 
             if (game.IsFinish(mines))
             {
+                dispatcherTimer.Stop();
                 WinWindow();
                 Restart();
             }
@@ -267,7 +270,7 @@ namespace MineSweeper
             {
                 first_click = false;
                 start_time = DateTime.Now;
-                time_span = 0;
+                time_span = 1;
                 this.Show_time = Convert.ToInt64(time_span).ToString("D3");
             }
             else
@@ -393,6 +396,7 @@ namespace MineSweeper
             OpenBlock(x, y);
             if (game.IsFinish(mines))
             {
+                dispatcherTimer.Stop();
                 WinWindow();
                 Restart();
             }
