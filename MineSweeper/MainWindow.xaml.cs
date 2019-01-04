@@ -42,5 +42,15 @@ namespace MineSweeper
         {
             VM.SimpleTest(VM.SimpleClick);
         }
+
+        private void ComplexFlag(object sender, RoutedEventArgs e)
+        {
+            VM.SimpleTest(VM.ComplexFlag);
+        }
+
+        private void ComplexClick(object sender, RoutedEventArgs e)
+        {
+            VM.SimpleTest(VM.ComplexClick);
+        }
     }
 }

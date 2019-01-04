@@ -12,6 +12,8 @@
                 <MenuItem Header="Restart" Click="Restart_Click"/>
                 <MenuItem Header="SimpleFlag" Click="SimpleFlag"/>
                 <MenuItem Header="SimpleClick" Click="SimpleClick"/>
+                <MenuItem Header="ComplexFlag" Click="ComplexFlag"/>
+                <MenuItem Header="ComplexClick" Click="ComplexClick"/>
             </MenuItem>
             <MenuItem Header="test">
                 <MenuItem Header="no"/>
