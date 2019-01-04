@@ -108,7 +108,7 @@ namespace MineSweeper
                 if (flag_count != mine.mine_count)
                     return;
 
-                LRClick(x,y);
+                LRClick(x, y);
 
             }
             both_down = false;
@@ -208,6 +208,7 @@ namespace MineSweeper
         }
         #endregion
 
+        #region block operation
         private void OpenBlock(int x, int y)
         {
             if (!mines[x, y].is_mine)
@@ -277,7 +278,9 @@ namespace MineSweeper
                 Restart();
             }
         }
+        #endregion
 
+        #region binding
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
             if (first_click == true)
@@ -323,7 +326,9 @@ namespace MineSweeper
                 OnPropertyChanged("Show_time");
             }
         }
+        #endregion
 
+        #region helpers in class
         public Mine WhichMine(Rectangle r, out int x, out int y)
         {
             for (int i = 0; i < row; i++)
@@ -415,14 +420,16 @@ namespace MineSweeper
             }
         }
 
+        #endregion
+
         #region AutoPlay
         public void SimpleTest(AutoPlay f)
         {
-            for(int i = 0; i < row; i++)
+            for (int i = 0; i < row; i++)
             {
-                for(int j = 0; j < col; j++)
+                for (int j = 0; j < col; j++)
                 {
-                    if(!mines[i,j].is_cover)
+                    if (!mines[i, j].is_cover)
                         f(i, j);
                 }
             }
@@ -432,11 +439,11 @@ namespace MineSweeper
         {
             int flag_count = 0;
             int unflag_count = 0;
-            for(int i = x - 1; i < x + 2; i++)
+            for (int i = x - 1; i < x + 2; i++)
             {
-                for(int j = y - 1; j < y + 2; j++)
+                for (int j = y - 1; j < y + 2; j++)
                 {
-                    if(InBorder(i,j) && mines[i, j].is_cover)
+                    if (InBorder(i, j) && mines[i, j].is_cover)
                     {
                         if (mines[i, j].is_flag)
                             flag_count++;
@@ -445,7 +452,7 @@ namespace MineSweeper
                 }
             }
 
-            if(unflag_count + flag_count == mines[x, y].mine_count)
+            if (unflag_count + flag_count == mines[x, y].mine_count)
             {
                 for (int i = x - 1; i < x + 2; i++)
                 {
@@ -481,7 +488,7 @@ namespace MineSweeper
                 }
             }
 
-            if(flag_count == mines[x, y].mine_count)
+            if (flag_count == mines[x, y].mine_count)
             {
                 LRClick(x, y);
                 if (unflag_count != 0)
