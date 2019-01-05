@@ -389,9 +389,9 @@ namespace MineSweeper
             {
                 for (int j = y - 1; j < y + 2; j++)
                 {
-                    if (InBorder(i, j) && mines[i,j].is_cover)
+                    if (InBorder(i, j) && mines[i, j].is_cover)
                     {
-                        if(!simplified)
+                        if (!simplified)
                             result.Add(new Position(i, j));
                         else
                         {
@@ -403,7 +403,7 @@ namespace MineSweeper
                     }
                 }
             }
-            foreach(Position p in result)
+            foreach (Position p in result)
             {
                 //Console.WriteLine("here{0}", p.x);
             }
@@ -551,8 +551,8 @@ namespace MineSweeper
                         {
                             for (int n = j - 1; n < j + 2; n++)
                             {
-                                if(InBorder(m,n) && InBorderNineByNine(m, n, x - 1, y - 1) 
-                                    && mines[m,n].is_cover)
+                                if (InBorder(m, n) && InBorderNineByNine(m, n, x - 1, y - 1)
+                                    && mines[m, n].is_cover)
                                 {
                                     edge.AddPosition(m, n);
                                 }
@@ -568,14 +568,14 @@ namespace MineSweeper
                 }
             }
 
-            for(int i = 0; i< units.Count; i++)
+            for (int i = 0; i < units.Count; i++)
             {
                 int diff = center.mine_count - units[i].mine_count;//at least diff mines
                 int diff_block = center.Blocks.Count - units[i].Blocks.Count;
-                if(diff == diff_block)
+                if (diff == diff_block)
                 {
                     center.Blocks.ExceptWith(units[i].Blocks);
-                    foreach(Position p in center.Blocks)
+                    foreach (Position p in center.Blocks)
                     {
                         mines[p.x, p.y].is_flag = true;
                         rectangles[p.x, p.y].Fill = BlockBrush.flag;
@@ -599,7 +599,7 @@ namespace MineSweeper
             {
                 for (int j = y - 1; j < y + 2; j++)
                 {
-                    if (InBorder(i, j) && !mines[i, j].is_cover)
+                    if (InBorder(i, j) && !mines[i, j].is_cover && mines[i, j].mine_count != 0)
                     {
                         SolveUnit edge = new SolveUnit(mines[i, j].mine_count);
                         edge.Simplified_blocks = GetBlockSet(i, j, true);
@@ -608,19 +608,13 @@ namespace MineSweeper
                     }
                 }
             }
-            Console.WriteLine("HHHHHHHHHHHHHHH {0} {1} {2}",x,y,units.Count);
-            foreach(SolveUnit s in units)
-            {
-                s.Print();
-            }
+
             for (int i = 0; i < units.Count; i++)
             {
-                if (units[i].Simplified_blocks.IsProperSupersetOf(center.Simplified_blocks) && 
+                if (units[i].Simplified_blocks.IsProperSubsetOf(center.Simplified_blocks) &&
                     units[i].comfirmed_mine_count == center.comfirmed_mine_count)
                 {
-                    Console.WriteLine("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-                    center.Simplified_blocks.ExceptWith(units[i].Simplified_blocks);
-                    foreach(Position p in center.Simplified_blocks)
+                    foreach (Position p in center.Simplified_blocks)
                     {
                         OpenBlock(p.x, p.y);//win or lose
                     }
@@ -637,6 +631,16 @@ namespace MineSweeper
             return true;
         }
 
+        #endregion
+
+        #region debug
+        private void CheckSet(HashSet<Position> h)
+        {
+            foreach (Position p in h)
+            {
+                Console.WriteLine("check: {0} {1}", p.x, p.y);
+            }
+        }
         #endregion
     }
 }

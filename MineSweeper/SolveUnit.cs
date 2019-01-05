@@ -24,7 +24,7 @@ namespace MineSweeper
         public int unflag_count;
         public int block_count;
 
-        public BlockInfo(int mc,int fc, int uc, int bc)
+        public BlockInfo(int mc, int fc, int uc, int bc)
         {
             mine_count = mc;
             flag_count = fc;
@@ -54,13 +54,13 @@ namespace MineSweeper
             blocks.Add(new Position(x, y));
         }
 
-        public void Print()
-        {
-            foreach(Position p in Simplified_blocks)
-            {
-                Console.WriteLine("p:{0} {1}", p.x, p.y);
-            }
-            Console.WriteLine();
-        }
+        //public void Print()
+        //{
+        //    foreach(Position p in Simplified_blocks)
+        //    {
+        //        Console.WriteLine("p:{0} {1}", p.x, p.y);
+        //    }
+        //    Console.WriteLine();
+        //}
     }
 }
