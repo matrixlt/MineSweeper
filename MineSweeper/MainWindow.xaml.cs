@@ -35,22 +35,22 @@ namespace MineSweeper
 
         private void SimpleFlag(object sender, RoutedEventArgs e)
         {
-            VM.SimpleTest(VM.SimpleFlag);
+            VM.player.SimpleTest(VM.player.SimpleFlag);
         }
 
         private void SimpleClick(object sender, RoutedEventArgs e)
         {
-            VM.SimpleTest(VM.SimpleClick);
+            VM.player.SimpleTest(VM.player.SimpleClick);
         }
 
         private void ComplexFlag(object sender, RoutedEventArgs e)
         {
-            VM.SimpleTest(VM.ComplexFlag);
+            VM.player.SimpleTest(VM.player.ComplexFlag);
         }
 
         private void ComplexClick(object sender, RoutedEventArgs e)
         {
-            VM.SimpleTest(VM.ComplexClick);
+            VM.player.SimpleTest(VM.player.ComplexClick);
         }
     }
 }

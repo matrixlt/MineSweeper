@@ -29,10 +29,10 @@ namespace MineSweeper
         private int time_span;
         private double total_time;
         private string show_time = "000";
-        #endregion
-        //only used in class
+
         private int elapse_time;
         private DispatcherTimer dispatcherTimer = new DispatcherTimer();
+        #endregion
 
         #region other member
         public event PropertyChangedEventHandler PropertyChanged;
@@ -47,8 +47,8 @@ namespace MineSweeper
         Game game = new Game();
 
         public delegate bool AutoPlay(int x, int y);
+        public AutoPlayer player;
         #endregion
-        //maybe used out of class
 
         #region constructor
         public MainWindowViewModel()
@@ -56,8 +56,15 @@ namespace MineSweeper
             this.row = 10;
             this.col = 10;
             this.mine_number = 15;
-            mines = new Mine[row, col];
-            rectangles = new Rectangle[row, col];
+            Mines = new Mine[row, col];
+            Rectangles = new Rectangle[row, col];
+
+            player = new AutoPlayer(row, col, Mines, Rectangles);
+            player.inBorder = InBorder;
+            player.lRClick = LRClick;
+            player.openBlock = OpenBlock;
+            player.openEmpty = OpenEmpty;
+
             number_show = game.Generate(row, col, mine_number);
             for (int i = 0; i < row; i++)
             {
@@ -72,8 +79,8 @@ namespace MineSweeper
                     border.Background = new SolidColorBrush(Colors.Tan);
                     border.BorderThickness = new Thickness(1);
 
-                    mines[i, j] = mymine;
-                    rectangles[i, j] = myrectangle;
+                    Mines[i, j] = mymine;
+                    Rectangles[i, j] = myrectangle;
 
                     myrectangle.Fill = Brushes.AliceBlue;
                     myrectangle.PreviewMouseRightButtonUp += new MouseButtonEventHandler(RClick);
@@ -102,7 +109,7 @@ namespace MineSweeper
                 {
                     for (int j = y - 1; j < y + 2; j++)
                     {
-                        if (InBorder(i, j) && mines[i, j].is_flag)
+                        if (InBorder(i, j) && Mines[i, j].is_flag)
                         {
                             flag_count++;
                         }
@@ -183,7 +190,7 @@ namespace MineSweeper
                 }
             }
 
-            if (game.IsFinish(mines))
+            if (game.IsFinish(Mines))
             {
                 dispatcherTimer.Stop();
                 total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
@@ -216,17 +223,26 @@ namespace MineSweeper
         #endregion
 
         #region block operation
-        private void OpenBlock(int x, int y)
+        public bool OpenBlock(int x, int y)
         {
-            if (!mines[x, y].is_mine)
-                rectangles[x, y].Fill = BlockBrush.numbers[mines[x, y].mine_count];
+            if (!Mines[x, y].is_mine)
+                Rectangles[x, y].Fill = BlockBrush.numbers[Mines[x, y].mine_count];
             else
             {
-                rectangles[x, y].Fill = BlockBrush.mine;
+                Rectangles[x, y].Fill = BlockBrush.mine;
                 borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
+                LoseWindow();
+                Restart();
+                return true;
             }
-            mines[x, y].is_cover = false;
-
+            Mines[x, y].is_cover = false;
+            if (game.IsFinish(Mines))
+            {
+                WinWindow();
+                Restart();
+                return true;
+            }
+            return false;
         }
 
         private void OpenEmpty(int x, int y)
@@ -239,7 +255,7 @@ namespace MineSweeper
                 {
                     if (InBorder(i, j))
                     {
-                        if (mines[i, j].mine_count == 0 && mines[i, j].is_cover)
+                        if (Mines[i, j].mine_count == 0 && Mines[i, j].is_cover)
                         {
                             OpenEmpty(i, j);
                         }
@@ -252,37 +268,23 @@ namespace MineSweeper
             }
         }
 
-        private void LRClick(int x, int y)
+        public void LRClick(int x, int y)//in or lose in it
         {
-            bool lose = false;
             for (int i = x - 1; i < x + 2; i++)
             {
                 for (int j = y - 1; j < y + 2; j++)
                 {
-                    if (InBorder(i, j) && !mines[i, j].is_flag)
+                    if (InBorder(i, j) && !Mines[i, j].is_flag)
                     {
-                        if (mines[i, j].mine_count == 0)
+                        if (Mines[i, j].mine_count == 0)
                             OpenEmpty(i, j);
-                        else OpenBlock(i, j);
-                        if (mines[i, j].is_mine)
+                        else
                         {
-                            lose = true;
+                            if(OpenBlock(i, j)) return;
                         }
                     }
 
                 }
-            }
-
-            if (lose)
-            {
-                LoseWindow();
-                Restart();
-            }
-
-            if (game.IsFinish(mines))
-            {
-                WinWindow();
-                Restart();
             }
         }
         #endregion
@@ -337,6 +339,9 @@ namespace MineSweeper
                 OnPropertyChanged("Show_time");
             }
         }
+
+        public Mine[,] Mines { get => mines; set => mines = value; }
+        public Rectangle[,] Rectangles { get => rectangles; set => rectangles = value; }
         #endregion
 
         #region helpers in class
@@ -346,11 +351,11 @@ namespace MineSweeper
             {
                 for (int j = 0; j < col; j++)
                 {
-                    if (Object.ReferenceEquals(r, rectangles[i, j]))
+                    if (Object.ReferenceEquals(r, Rectangles[i, j]))
                     {
                         x = i;
                         y = j;
-                        return mines[i, j];
+                        return Mines[i, j];
                     }
                 }
             }
@@ -360,65 +365,6 @@ namespace MineSweeper
         public bool InBorder(int x, int y)
         {
             return (x >= 0 && x < row && y >= 0 && y < col);
-        }
-
-        public bool InBorderNineByNine(int x, int y, int x_low, int y_low)
-        {
-            return (x >= x_low && x < x_low + 3 && y >= y_low && y < y_low + 3);
-        }
-
-        private BlockInfo GetInfo(int x, int y)//3*3
-        {
-            int flag = 0;
-            int unflag = 0;
-            int block = 0;
-            for (int i = x - 1; i < x + 2; i++)
-            {
-                for (int j = y - 1; j < y + 2; j++)
-                {
-                    if (InBorder(i, j))
-                    {
-                        block++;
-                        if (mines[i, j].is_cover)
-                        {
-                            if (mines[i, j].is_flag)
-                            { flag++; }
-                            else { unflag++; }
-                        }
-                    }
-                }
-            }
-
-            return new BlockInfo(mines[x, y].mine_count, flag, unflag, block);
-
-        }
-
-        private HashSet<Position> GetBlockSet(int x, int y, bool simplified = false)
-        {
-            var result = new HashSet<Position> { };
-            for (int i = x - 1; i < x + 2; i++)
-            {
-                for (int j = y - 1; j < y + 2; j++)
-                {
-                    if (InBorder(i, j) && mines[i, j].is_cover)
-                    {
-                        if (!simplified)
-                            result.Add(new Position(i, j));
-                        else
-                        {
-                            if (!mines[i, j].is_flag)
-                            {
-                                result.Add(new Position(i, j));
-                            }
-                        }
-                    }
-                }
-            }
-            foreach (Position p in result)
-            {
-                //Console.WriteLine("here{0}", p.x);
-            }
-            return result;
         }
 
         public void WinWindow()
@@ -439,7 +385,7 @@ namespace MineSweeper
             MessageBox.Show(messageBoxText, caption, button, icon);
         }
 
-        public void Restart()                           //much more things to do
+        public void Restart()                           //much more things to do,such as frash AutoPlayer
         {
             in_game = false;
             first_click = true;
@@ -448,7 +394,7 @@ namespace MineSweeper
             dispatcherTimer.Stop();
             this.Show_time = "000";
 
-            foreach (Rectangle r in rectangles)
+            foreach (Rectangle r in Rectangles)
             {
                 r.Fill = Brushes.AliceBlue;
             }
@@ -459,12 +405,13 @@ namespace MineSweeper
 
             game = new Game();
             number_show = game.Generate(row, col, mine_number);
+            player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
                 {
                     Mine mymine = new Mine(game.GetMineCount(i, j));
-                    mines[i, j] = mymine;
+                    Mines[i, j] = mymine;
                 }
             }
 
@@ -482,180 +429,20 @@ namespace MineSweeper
                 for (int j = 0; j < col; j++)
                 {
                     Mine mymine = new Mine(game.GetMineCount(i, j));
-                    mines[i, j] = mymine;
+                    Mines[i, j] = mymine;
                 }
             }
+            if (Mines[x, y].mine_count != 0)
+                OpenBlock(x, y);
+            else OpenEmpty(x, y);
 
-            OpenBlock(x, y);
-            if (game.IsFinish(mines))
+            if (game.IsFinish(Mines))
             {
                 WinWindow();
                 Restart();
             }
         }
 
-        #endregion
-
-        #region AutoPlay
-        public void SimpleTest(AutoPlay f)
-        {
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    if (!mines[i, j].is_cover)
-                        f(i, j);
-                }
-            }
-        }
-
-        public bool SimpleFlag(int x, int y)
-        {
-            BlockInfo info = GetInfo(x, y);
-            int flag_count = info.flag_count;
-            int unflag_count = info.unflag_count;
-
-
-            if (unflag_count + flag_count == mines[x, y].mine_count)
-            {
-                for (int i = x - 1; i < x + 2; i++)
-                {
-                    for (int j = y - 1; j < y + 2; j++)
-                    {
-                        if (InBorder(i, j) && mines[i, j].is_cover)
-                        {
-                            mines[i, j].is_flag = true;
-                            rectangles[i, j].Fill = BlockBrush.flag;
-                        }
-                    }
-                }
-                if (unflag_count > 0)
-                    return true;
-            }
-            return false;
-        }
-
-        public bool SimpleClick(int x, int y)
-        {
-            BlockInfo info = GetInfo(x, y);
-            int flag_count = info.flag_count;
-            int unflag_count = info.unflag_count;
-
-            if (flag_count == mines[x, y].mine_count)
-            {
-                LRClick(x, y);
-                if (unflag_count != 0)
-                    return true;
-            }
-            return false;
-        }
-
-        public bool ComplexFlag(int x, int y)//analyze in 3*3, opt needed
-        {
-            List<SolveUnit> units = new List<SolveUnit> { };
-            SolveUnit center = new SolveUnit(mines[x, y].mine_count);
-
-            for (int i = x - 1; i < x + 2; i++)
-            {
-                for (int j = y - 1; j < y + 2; j++)
-                {
-                    if (InBorder(i, j) && !mines[i, j].is_cover)
-                    {
-                        SolveUnit edge = new SolveUnit(mines[i, j].mine_count);
-                        for (int m = i - 1; m < i + 2; m++)
-                        {
-                            for (int n = j - 1; n < j + 2; n++)
-                            {
-                                if (InBorder(m, n) && InBorderNineByNine(m, n, x - 1, y - 1)
-                                    && mines[m, n].is_cover)
-                                {
-                                    edge.AddPosition(m, n);
-                                }
-                            }
-                        }
-                        units.Add(edge);
-
-                    }
-                    if (InBorder(i, j) && mines[i, j].is_cover)
-                    {
-                        center.AddPosition(i, j);
-                    }
-                }
-            }
-
-            for (int i = 0; i < units.Count; i++)
-            {
-                int diff = center.mine_count - units[i].mine_count;//at least diff mines
-                int diff_block = center.Blocks.Count - units[i].Blocks.Count;
-                if (diff == diff_block)
-                {
-                    center.Blocks.ExceptWith(units[i].Blocks);
-                    foreach (Position p in center.Blocks)
-                    {
-                        mines[p.x, p.y].is_flag = true;
-                        rectangles[p.x, p.y].Fill = BlockBrush.flag;
-                        return true;
-                    }
-                }
-            }
-            return false;
-
-        }
-
-        public bool ComplexClick(int x, int y)//analyze in 3*3+,simplified and comfirmed
-        {
-            List<SolveUnit> units = new List<SolveUnit> { };
-            SolveUnit center = new SolveUnit(mines[x, y].mine_count);
-
-            center.Simplified_blocks = GetBlockSet(x, y, true);
-            center.comfirmed_mine_count = mines[x, y].mine_count - GetInfo(x, y).flag_count;
-
-            for (int i = x - 1; i < x + 2; i++)
-            {
-                for (int j = y - 1; j < y + 2; j++)
-                {
-                    if (InBorder(i, j) && !mines[i, j].is_cover && mines[i, j].mine_count != 0)
-                    {
-                        SolveUnit edge = new SolveUnit(mines[i, j].mine_count);
-                        edge.Simplified_blocks = GetBlockSet(i, j, true);
-                        edge.comfirmed_mine_count = mines[i, j].mine_count - GetInfo(i, j).flag_count;
-                        units.Add(edge);
-                    }
-                }
-            }
-
-            for (int i = 0; i < units.Count; i++)
-            {
-                if (units[i].Simplified_blocks.IsProperSubsetOf(center.Simplified_blocks) &&
-                    units[i].comfirmed_mine_count == center.comfirmed_mine_count)
-                {
-                    foreach (Position p in center.Simplified_blocks)
-                    {
-                        OpenBlock(p.x, p.y);//win or lose
-                    }
-                    return true;
-                }
-            }
-
-
-            return false;
-        }
-
-        public bool CompleteAnalyze(int x, int y)
-        {
-            return true;
-        }
-
-        #endregion
-
-        #region debug
-        private void CheckSet(HashSet<Position> h)
-        {
-            foreach (Position p in h)
-            {
-                Console.WriteLine("check: {0} {1}", p.x, p.y);
-            }
-        }
         #endregion
     }
 }
