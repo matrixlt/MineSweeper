@@ -48,9 +48,53 @@ namespace MineSweeper
             VM.player.SimpleTest(VM.player.ComplexFlag);
         }
 
+        private void UncertainComplexFlag(object sender, RoutedEventArgs e)
+        {
+            VM.player.SimpleTest(VM.player.UncertainComplexFlag);
+        }
+
         private void ComplexClick(object sender, RoutedEventArgs e)
         {
             VM.player.SimpleTest(VM.player.ComplexClick);
+        }
+
+        private void SimpleTest(object sender, RoutedEventArgs e)//rare bug??
+        {
+            bool click = true;
+            bool flag = true;
+            int count_click = 0;
+            int count_flag = 0;
+            int record_click = 0;
+            int record_flag = 0;
+            int i = 0;
+            while (true)
+            {
+                click = true;
+                record_click = count_click;
+                record_flag = count_flag;
+
+                flag = VM.player.SimpleTest(VM.player.SimpleFlag);
+                if (flag)
+                    count_flag++;
+
+                while (click)
+                {
+                    click = VM.player.SimpleTest(VM.player.SimpleClick);
+                    if (click)
+                        count_click++;
+                }
+                i++;
+                Console.WriteLine(i);
+                if (record_click == count_click && record_flag == count_flag)
+                    break;
+
+
+            }
+        }
+
+        private void ComplexTest(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

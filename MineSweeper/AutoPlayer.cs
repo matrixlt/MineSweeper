@@ -68,6 +68,7 @@ namespace MineSweeper
             return new BlockInfo(mines[x, y].mine_count, flag, unflag, block);
 
         }
+
         private HashSet<Position> GetBlockSet(int x, int y, bool simplified = false)
         {
             var result = new HashSet<Position> { };
@@ -95,17 +96,24 @@ namespace MineSweeper
             }
             return result;
         }
+
         #region AutoPlay
-        public void SimpleTest(AutoPlay f)
+        public bool SimpleTest(AutoPlay f)
         {
+            bool effective = false;
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
                 {
                     if (!mines[i, j].is_cover)
-                        f(i, j);
+                    {
+                        bool test = f(i, j);
+                        effective = test || effective;
+                    }
+                        
                 }
             }
+            return effective;
         }
 
         public bool SimpleFlag(int x, int y)
@@ -149,7 +157,7 @@ namespace MineSweeper
             return false;
         }
 
-        public bool ComplexFlag(int x, int y)//analyze in 3*3, opt needed
+        public bool UncertainComplexFlag(int x, int y)//analyze in 3*3+, opt needed
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -201,7 +209,56 @@ namespace MineSweeper
 
         }
 
-        public bool ComplexClick(int x, int y)//analyze in 3*3+,simplified and comfirmed
+        public bool ComplexFlag(int x, int y)
+        {
+            List<SolveUnit> units = new List<SolveUnit> { };
+            SolveUnit center = new SolveUnit(mines[x, y].mine_count);
+
+            center.Simplified_blocks = GetBlockSet(x, y, true);
+            center.comfirmed_mine_count = mines[x, y].mine_count - GetInfo(x, y).flag_count;
+
+            for (int i = x - 1; i < x + 2; i++)
+            {
+                for (int j = y - 1; j < y + 2; j++)
+                {
+                    if (inBorder(i, j) && !mines[i, j].is_cover && mines[i, j].mine_count != 0)
+                    {
+                        SolveUnit edge = new SolveUnit(mines[i, j].mine_count);
+                        edge.Simplified_blocks = GetBlockSet(i, j, true);
+                        edge.comfirmed_mine_count = mines[i, j].mine_count - GetInfo(i, j).flag_count;
+                        units.Add(edge);
+                    }
+                }
+            }
+
+            for (int i = 0; i < units.Count; i++)
+            {
+                if (units[i].Simplified_blocks.IsProperSubsetOf(center.Simplified_blocks) &&
+                    units[i].comfirmed_mine_count < center.comfirmed_mine_count)
+                {
+                    int mine_diff = center.comfirmed_mine_count - units[i].comfirmed_mine_count; 
+                    center.Simplified_blocks.ExceptWith(units[i].Simplified_blocks);
+                    int block_diff = center.Simplified_blocks.Count;
+                    if(mine_diff == block_diff)
+                    {
+                        foreach(Position p in center.Simplified_blocks)
+                        {
+                            mines[p.x, p.y].is_flag = true;
+                            rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                        }
+                    }
+                    else
+                    {
+                        center.Simplified_blocks.UnionWith(units[i].Simplified_blocks);
+                    }
+
+                }
+            }
+
+
+            return false;
+        }
+        public bool ComplexClick(int x, int y)//analyze in only 3*3,simplified and comfirmed
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);

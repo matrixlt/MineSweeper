@@ -245,7 +245,7 @@ namespace MineSweeper
             return false;
         }
 
-        private void OpenEmpty(int x, int y)
+        private void OpenEmpty(int x, int y)//opt needed
         {
             OpenBlock(x, y);
 
