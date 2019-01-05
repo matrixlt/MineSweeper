@@ -19,8 +19,8 @@ namespace MineSweeper
         private bool in_game = false;
         private bool first_click = true;
 
-        private int row;
-        private int col;
+        public int row;// i can't understand
+        public int col;
         private int mine_number;
         private bool both_down = false;
 
@@ -40,7 +40,7 @@ namespace MineSweeper
         List<Rectangle> mines_set = new List<Rectangle> { };
         List<Border> borders = new List<Border> { };
         Mine[,] mines = null;
-        int[,] number_show = null;
+        public int[,] distribution = null;
         Rectangle[,] rectangles = null;
         BlockBrush myBrush = new BlockBrush();
 
@@ -65,7 +65,7 @@ namespace MineSweeper
             player.openBlock = OpenBlock;
             player.openEmpty = OpenEmpty;
 
-            number_show = game.Generate(row, col, mine_number);
+            Distribution = game.Generate(row, col, mine_number);
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
@@ -342,6 +342,7 @@ namespace MineSweeper
 
         public Mine[,] Mines { get => mines; set => mines = value; }
         public Rectangle[,] Rectangles { get => rectangles; set => rectangles = value; }
+        public int[,] Distribution { get => distribution; set => distribution = value; }
         #endregion
 
         #region helpers in class
@@ -404,7 +405,7 @@ namespace MineSweeper
             }
 
             game = new Game();
-            number_show = game.Generate(row, col, mine_number);
+            Distribution = game.Generate(row, col, mine_number);
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
             {
@@ -422,7 +423,7 @@ namespace MineSweeper
             while (game.GetMineCount(x, y) == -1)
             {
                 game = new Game();
-                number_show = game.Generate(row, col, mine_number);
+                Distribution = game.Generate(row, col, mine_number);
             }
             for (int i = 0; i < row; i++)
             {

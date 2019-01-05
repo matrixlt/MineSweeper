@@ -55,6 +55,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AutoPlayer.cs" />
+    <Compile Include="SaveAndLoad.cs" />
     <Compile Include="SolveUnit.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

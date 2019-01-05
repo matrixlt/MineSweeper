@@ -21,11 +21,14 @@ namespace MineSweeper
     public partial class MainWindow : Window
     {
         MainWindowViewModel VM;
+        SaveAndLoad SL;
         public MainWindow()
         {
-            InitializeComponent();
             VM = new MainWindowViewModel();
+            SL = new SaveAndLoad();
             DataContext = VM;
+            InitializeComponent();
+            
         }
 
         private void Restart_Click(object sender, RoutedEventArgs e)//maybe should be in other place
@@ -84,7 +87,6 @@ namespace MineSweeper
                         count_click++;
                 }
                 i++;
-                Console.WriteLine(i);
                 if (record_click == count_click && record_flag == count_flag)
                     break;
 
@@ -96,5 +98,13 @@ namespace MineSweeper
         {
 
         }
+
+        private void Save(object sender, RoutedEventArgs e)
+        {
+
+            SaveAndLoad.Save(VM.row, VM.col, VM.distribution, @"F:\");
+            Console.WriteLine("!!!!!!!!!{0}", VM.Row);
+        }
+
     }
 }
