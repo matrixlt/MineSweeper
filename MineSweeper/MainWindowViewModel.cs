@@ -24,11 +24,15 @@ namespace MineSweeper
         private int mine_number;
         private bool both_down = false;
 
+        private bool first_interval = true;
         private DateTime start_time;
-        private double time_span;
+        private int time_span;
+        private double total_time;
         private string show_time = "000";
         #endregion
         //only used in class
+        private int elapse_time;
+        private DispatcherTimer dispatcherTimer = new DispatcherTimer();
 
         #region other member
         public event PropertyChangedEventHandler PropertyChanged;
@@ -140,10 +144,9 @@ namespace MineSweeper
             if (first_click)
             {                                       //TODO start a game or modify sth ,start the timer or sth
                 in_game = true;
-                //first_click = false;
-                DispatcherTimer dispatcherTimer = new DispatcherTimer();
+                first_click = false;
                 dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
                 dispatcherTimer.Start();
                 if (mine.is_mine)
                 {
@@ -160,6 +163,8 @@ namespace MineSweeper
                     in_game = false;
                     s.Fill = BlockBrush.mine;
                     borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
+                    dispatcherTimer.Stop();
+                    total_time = 0;
                     LoseWindow();
                     Restart();
                 }
@@ -180,6 +185,8 @@ namespace MineSweeper
 
             if (game.IsFinish(mines))
             {
+                dispatcherTimer.Stop();
+                total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
                 WinWindow();
                 Restart();
             }
@@ -283,23 +290,27 @@ namespace MineSweeper
         #region binding
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if (first_click == true)
+            if (first_interval == true)
             {
-                first_click = false;
+                first_interval = false;
                 start_time = DateTime.Now;
                 time_span = 0;
                 this.Show_time = Convert.ToInt64(time_span).ToString("D3");
             }
             else
             {
-                time_span = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
-                if (time_span > 999)
+                elapse_time = (int)(DateTime.Now - start_time).TotalSeconds - time_span;
+                if (elapse_time >= 1)
                 {
-                    this.Show_time = Convert.ToInt64(time_span - 1000).ToString("D3");
-                }
-                else
-                {
-                    this.Show_time = Convert.ToInt64(time_span).ToString("D3");
+                    time_span = elapse_time + time_span;
+                    if (time_span > 999)
+                    {
+                        this.Show_time = Convert.ToInt64(time_span - 1000).ToString("D3");
+                    }
+                    else
+                    {
+                        this.Show_time = Convert.ToInt64(time_span).ToString("D3");
+                    }
                 }
                 //Console.WriteLine(show_time);
             }
@@ -432,6 +443,10 @@ namespace MineSweeper
         {
             in_game = false;
             first_click = true;
+            first_interval = true;
+
+            dispatcherTimer.Stop();
+            this.Show_time = "000";
 
             foreach (Rectangle r in rectangles)
             {
