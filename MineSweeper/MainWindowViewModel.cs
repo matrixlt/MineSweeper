@@ -301,9 +301,33 @@ namespace MineSweeper
             }
         }
 
-        public int Row { get { return row; } set => row = value; }
-        public int Col { get { return col; } set => col = value; }
-        public List<Border> BorderSet { get { return borders; } set => borders = value; }
+        public int Row
+        {
+            get { return row; }
+            set
+            {
+                row = value;
+                OnPropertyChanged("Row");
+            }
+        }
+        public int Col
+        {
+            get { return col; }
+            set
+            {
+                col = value;
+                OnPropertyChanged("Col");
+            }
+        }
+        public List<Border> BorderSet
+        {
+            get { return borders; }
+            set
+            {
+                borders = value;
+                OnPropertyChanged("BorderSet");
+            }
+        }
         public string Show_time
         {
             get => show_time;
@@ -324,7 +348,7 @@ namespace MineSweeper
         {
             Mines = new Mine[game.row, game.col];
             Rectangles = new Rectangle[game.row, game.col];
-            BorderSet = new List<Border> { };
+            List<Border> newBorderSet = new List<Border> { };
             for (int i = 0; i < game.row; i++)
             {
                 for (int j = 0; j < game.col; j++)
@@ -334,7 +358,7 @@ namespace MineSweeper
 
                     Border border = new Border();
                     border.Child = myrectangle;
-                    borders.Add(border);
+                    newBorderSet.Add(border);
                     border.Background = new SolidColorBrush(Colors.Tan);
                     border.BorderThickness = new Thickness(1);
 
@@ -349,6 +373,7 @@ namespace MineSweeper
 
                 }
             }
+            BorderSet = newBorderSet;
         }
 
         public Mine WhichMine(Rectangle r, out int x, out int y)
