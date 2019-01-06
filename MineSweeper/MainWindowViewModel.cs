@@ -24,6 +24,8 @@ namespace MineSweeper
         private int mine_number;
         private bool both_down = false;
 
+        private int height;
+        private int width;
         private bool first_interval = true;
         private DateTime start_time;
         private int time_span;
@@ -58,7 +60,8 @@ namespace MineSweeper
             this.mine_number = game.mine_number;
 
             Ininitialize(game);
-
+            Height = 20 * Row;
+            Width = 20 * Col;
             player = new AutoPlayer(row, col, Mines, Rectangles);
             player.inBorder = InBorder;
             player.lRClick = LRClick;
@@ -341,6 +344,15 @@ namespace MineSweeper
         public Mine[,] Mines { get => mines; set => mines = value; }
         public Rectangle[,] Rectangles { get => rectangles; set => rectangles = value; }
         public int[,] Distribution { get => distribution; set => distribution = value; }
+        public int Height { get => height; set {
+                height = value;
+                OnPropertyChanged("Height");
+            } }
+        public int Width { get => width; set {
+                width = value;
+                OnPropertyChanged("Width");
+
+            } }
         #endregion
 
         #region helpers in class
@@ -486,11 +498,13 @@ namespace MineSweeper
             this.Show_time = "000";
 
             game = new Game(distribution);
-            this.row = game.row;
-            this.col = game.col;
+            Row = game.row;
+            Col = game.col;
             this.mine_number = game.mine_number;
 
             Ininitialize(game);
+            Height = 20 * Row;
+            Width = 20 * Col;
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
             {

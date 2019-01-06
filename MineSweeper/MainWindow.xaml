@@ -47,7 +47,7 @@
         <ItemsControl ItemsSource="{Binding BorderSet}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Columns="{Binding Col}" Rows="{Binding Row}"  Height="350" Width="350"/>
+                    <UniformGrid Columns="{Binding Col}" Rows="{Binding Row}"  Height="{Binding Height}" Width="{Binding Width}"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
