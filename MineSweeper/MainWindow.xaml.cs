@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -28,7 +29,7 @@ namespace MineSweeper
             SL = new SaveAndLoad();
             DataContext = VM;
             InitializeComponent();
-            
+
         }
 
         private void Restart_Click(object sender, RoutedEventArgs e)//maybe should be in other place
@@ -101,9 +102,19 @@ namespace MineSweeper
 
         private void Save(object sender, RoutedEventArgs e)
         {
+            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
+            DialogResult result = folderBrowserDialog.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.Cancel)
+            {
+                return;
+            }
+            else
+            {
+                SaveAndLoad.Save(VM.row, VM.col, VM.distribution, folderBrowserDialog.SelectedPath);
+                //Console.WriteLine("!!!!!!!!!{0}", VM.Row);
+            }
 
-            SaveAndLoad.Save(VM.row, VM.col, VM.distribution, @"F:\");
-            Console.WriteLine("!!!!!!!!!{0}", VM.Row);
+
         }
 
     }
