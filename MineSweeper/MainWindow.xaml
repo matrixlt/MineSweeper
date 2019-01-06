@@ -22,7 +22,7 @@
             </MenuItem>
             <MenuItem Header="file">
                 <MenuItem Header="Save" Click="Save"/>
-                <MenuItem Header="Load" />
+                <MenuItem Header="Load" Click="Load"/>
             </MenuItem>
         </Menu>
         <Grid DockPanel.Dock="Top" >

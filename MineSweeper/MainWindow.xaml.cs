@@ -7,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -27,8 +26,8 @@ namespace MineSweeper
         {
             VM = new MainWindowViewModel();
             SL = new SaveAndLoad();
-            DataContext = VM;
             InitializeComponent();
+            DataContext = VM;
 
         }
 
@@ -102,17 +101,50 @@ namespace MineSweeper
 
         private void Save(object sender, RoutedEventArgs e)
         {
-            FolderBrowserDialog folderBrowserDialog = new FolderBrowserDialog();
-            DialogResult result = folderBrowserDialog.ShowDialog();
-            if (result == System.Windows.Forms.DialogResult.Cancel)
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            DateTime time = DateTime.Now;
+            dlg.FileName = "Minesweeper" + time.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-");
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Minesweeper (.txt)|*.txt";
+
+
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
             {
-                return;
+                // Save document
+                string filename = dlg.FileName;
+                SaveAndLoad.Save(VM.row, VM.col, VM.distribution, filename);
             }
-            else
+
+
+        }
+
+        private void Load(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = "";
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "Minesweeper documents (.txt)|*.txt";
+            int[,] distribution = null;
+
+            Nullable<bool> result = dlg.ShowDialog();
+            if (result == true)
             {
-                SaveAndLoad.Save(VM.row, VM.col, VM.distribution, folderBrowserDialog.SelectedPath);
-                //Console.WriteLine("!!!!!!!!!{0}", VM.Row);
+                // Open document
+                string filename = dlg.FileName;
+                distribution = SaveAndLoad.Load(filename);
             }
+            int row = distribution.GetLength(0);
+            int col = distribution.GetLength(1);
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    Console.Write(distribution[i, j]);
+                }
+                Console.WriteLine();
+            }
+            VM.Restart(distribution);
 
 
         }

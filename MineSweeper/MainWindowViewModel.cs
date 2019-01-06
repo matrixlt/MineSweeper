@@ -19,7 +19,7 @@ namespace MineSweeper
         private bool in_game = false;
         private bool first_click = true;
 
-        public int row;// i can't understand
+        public int row;
         public int col;
         private int mine_number;
         private bool both_down = false;
@@ -37,7 +37,6 @@ namespace MineSweeper
         #region other member
         public event PropertyChangedEventHandler PropertyChanged;
 
-        List<Rectangle> mines_set = new List<Rectangle> { };
         List<Border> borders = new List<Border> { };
         Mine[,] mines = null;
         public int[,] distribution = null;
@@ -53,43 +52,18 @@ namespace MineSweeper
         #region constructor
         public MainWindowViewModel()
         {
-            this.row = 10;
-            this.col = 15;
-            this.mine_number = 15;
-            Mines = new Mine[row, col];
-            Rectangles = new Rectangle[row, col];
+            Distribution = game.Generate(10, 15, 15);
+            this.row = game.row;
+            this.col = game.col;
+            this.mine_number = game.mine_number;
+
+            Ininitialize(game);
 
             player = new AutoPlayer(row, col, Mines, Rectangles);
             player.inBorder = InBorder;
             player.lRClick = LRClick;
             player.openBlock = OpenBlock;
             player.openEmpty = OpenEmpty;
-
-            Distribution = game.Generate(row, col, mine_number);
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    Mine mymine = new Mine(game.GetMineCount(i, j));
-                    Rectangle myrectangle = new Rectangle();
-
-                    Border border = new Border();
-                    border.Child = myrectangle;
-                    borders.Add(border);
-                    border.Background = new SolidColorBrush(Colors.Tan);
-                    border.BorderThickness = new Thickness(1);
-
-                    Mines[i, j] = mymine;
-                    Rectangles[i, j] = myrectangle;
-
-                    myrectangle.Fill = Brushes.AliceBlue;
-                    myrectangle.PreviewMouseRightButtonUp += new MouseButtonEventHandler(RClick);
-                    myrectangle.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LClick);
-                    myrectangle.PreviewMouseDown += new MouseButtonEventHandler(MouseDown);
-                    myrectangle.PreviewMouseUp += new MouseButtonEventHandler(MouseUp);
-
-                }
-            }
         }
         #endregion
 
@@ -280,7 +254,7 @@ namespace MineSweeper
                             OpenEmpty(i, j);
                         else
                         {
-                            if(OpenBlock(i, j)) return;
+                            if (OpenBlock(i, j)) return;
                         }
                     }
 
@@ -327,9 +301,9 @@ namespace MineSweeper
             }
         }
 
-        public int Row { get { return row; }}
-        public int Col { get { return col; }}
-        public List<Border> BorderSet { get { return borders; } }
+        public int Row { get { return row; } set => row = value; }
+        public int Col { get { return col; } set => col = value; }
+        public List<Border> BorderSet { get { return borders; } set => borders = value; }
         public string Show_time
         {
             get => show_time;
@@ -346,6 +320,37 @@ namespace MineSweeper
         #endregion
 
         #region helpers in class
+        public void Ininitialize(Game game)
+        {
+            Mines = new Mine[game.row, game.col];
+            Rectangles = new Rectangle[game.row, game.col];
+            BorderSet = new List<Border> { };
+            for (int i = 0; i < game.row; i++)
+            {
+                for (int j = 0; j < game.col; j++)
+                {
+                    Mine mymine = new Mine(game.GetMineCount(i, j));
+                    Rectangle myrectangle = new Rectangle();
+
+                    Border border = new Border();
+                    border.Child = myrectangle;
+                    borders.Add(border);
+                    border.Background = new SolidColorBrush(Colors.Tan);
+                    border.BorderThickness = new Thickness(1);
+
+                    Mines[i, j] = mymine;
+                    Rectangles[i, j] = myrectangle;
+
+                    myrectangle.Fill = Brushes.AliceBlue;
+                    myrectangle.PreviewMouseRightButtonUp += new MouseButtonEventHandler(RClick);
+                    myrectangle.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LClick);
+                    myrectangle.PreviewMouseDown += new MouseButtonEventHandler(MouseDown);
+                    myrectangle.PreviewMouseUp += new MouseButtonEventHandler(MouseUp);
+
+                }
+            }
+        }
+
         public Mine WhichMine(Rectangle r, out int x, out int y)
         {
             for (int i = 0; i < row; i++)
@@ -437,6 +442,8 @@ namespace MineSweeper
                 OpenBlock(x, y);
             else OpenEmpty(x, y);
 
+            player.SetProperties(row, col, Mines, Rectangles);
+
             if (game.IsFinish(Mines))
             {
                 WinWindow();
@@ -444,6 +451,32 @@ namespace MineSweeper
             }
         }
 
+        public void Restart(int[,] distribution)
+        {
+            in_game = false;
+            first_click = true;
+            first_interval = true;
+
+            dispatcherTimer.Stop();
+            this.Show_time = "000";
+
+            game = new Game(distribution);
+            this.row = game.row;
+            this.col = game.col;
+            this.mine_number = game.mine_number;
+
+            Ininitialize(game);
+            player.SetProperties(row, col, Mines, Rectangles);
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    Mine mymine = new Mine(game.GetMineCount(i, j));
+                    Mines[i, j] = mymine;
+                }
+            }
+
+        }
         #endregion
     }
 }

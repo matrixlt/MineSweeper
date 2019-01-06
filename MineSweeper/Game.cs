@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MineSweeper
 {
-    class Game
+    public class Game
     {
         public static int id = 0;
         public bool is_over;
@@ -24,6 +24,25 @@ namespace MineSweeper
             id += 1;
             is_over = false;
             win = false;
+        }
+
+        public Game(int[,] distribution)
+        {
+            id += 1;
+            is_over = false;
+            win = false;
+            this.distribution = distribution;
+            row = distribution.GetLength(0);
+            col = distribution.GetLength(1);
+            int count = 0;
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    count += distribution[i, j];
+                }
+            }
+            mine_number = count;
         }
 
         public static void Shuffle(int[] list)
