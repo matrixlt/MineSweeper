@@ -144,6 +144,7 @@ namespace MineSweeper
                 string filename = dlg.FileName;
                 distribution = SaveAndLoad.Load(filename);
             }
+            else return;
             int row = distribution.GetLength(0);
             int col = distribution.GetLength(1);
             for (int i = 0; i < row; i++)

@@ -111,7 +111,7 @@ namespace MineSweeper
                         bool test = f(i, j);
                         effective = test || effective;
                     }
-                        
+
                 }
             }
             return effective;
@@ -237,12 +237,12 @@ namespace MineSweeper
                 if (units[i].Simplified_blocks.IsProperSubsetOf(center.Simplified_blocks) &&
                     units[i].comfirmed_mine_count < center.comfirmed_mine_count)
                 {
-                    int mine_diff = center.comfirmed_mine_count - units[i].comfirmed_mine_count; 
+                    int mine_diff = center.comfirmed_mine_count - units[i].comfirmed_mine_count;
                     center.Simplified_blocks.ExceptWith(units[i].Simplified_blocks);
                     int block_diff = center.Simplified_blocks.Count;
-                    if(mine_diff == block_diff)
+                    if (mine_diff == block_diff)
                     {
-                        foreach(Position p in center.Simplified_blocks)
+                        foreach (Position p in center.Simplified_blocks)
                         {
                             mines[p.x, p.y].is_flag = true;
                             rectangles[p.x, p.y].Fill = BlockBrush.flag;
@@ -322,13 +322,13 @@ namespace MineSweeper
                 for (int j = y - 2; j < y + 3; j++)
                 {
                     if (inBorder(i, j) && !mines[i, j].is_cover            // in border and is a uncovered number 
-                        && mines[i, j].mine_count != 0 &&(x != i || y != j)//number is not 0 and is not center(x,y)
+                        && mines[i, j].mine_count != 0 && (x != i || y != j)//number is not 0 and is not center(x,y)
                         )
                     {
                         SolveUnit edge = new SolveUnit(mines[i, j].mine_count);
                         edge.Simplified_blocks = GetBlockSet(i, j, true);
                         edge.comfirmed_mine_count = mines[i, j].mine_count - GetInfo(i, j).flag_count;
-                        if(edge.comfirmed_mine_count != 0)                  //not a empty condition
+                        if (edge.comfirmed_mine_count != 0)                  //not a empty condition
                             units.Add(edge);
                     }
                 }
@@ -389,9 +389,9 @@ namespace MineSweeper
         {
             int mine_count = 0;
             int flag_count = 0;
-            for(int i = 0; i < row; i++)
+            for (int i = 0; i < row; i++)
             {
-                for(int j = 0;j < col; j++)
+                for (int j = 0; j < col; j++)
                 {
                     if (mines[i, j].is_mine)
                         mine_count++;
@@ -400,7 +400,7 @@ namespace MineSweeper
                 }
             }
 
-            if(mine_count == flag_count)
+            if (mine_count == flag_count)
             {
                 for (int i = 0; i < row; i++)
                 {

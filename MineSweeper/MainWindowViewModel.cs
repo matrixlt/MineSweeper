@@ -344,15 +344,23 @@ namespace MineSweeper
         public Mine[,] Mines { get => mines; set => mines = value; }
         public Rectangle[,] Rectangles { get => rectangles; set => rectangles = value; }
         public int[,] Distribution { get => distribution; set => distribution = value; }
-        public int Height { get => height; set {
+        public int Height
+        {
+            get => height; set
+            {
                 height = value;
                 OnPropertyChanged("Height");
-            } }
-        public int Width { get => width; set {
+            }
+        }
+        public int Width
+        {
+            get => width; set
+            {
                 width = value;
                 OnPropertyChanged("Width");
 
-            } }
+            }
+        }
         #endregion
 
         #region helpers in class
