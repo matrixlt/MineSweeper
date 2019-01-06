@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="450" ResizeMode="NoResize">
+        Title="MainWindow" Height="500" Width="850" ResizeMode="NoResize">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="new">
                 <MenuItem Header="Restart" Click="Restart_Click"/>
                 <MenuItem Header="SimpleFlag" Click="SimpleFlag"/>
                 <MenuItem Header="SimpleClick" Click="SimpleClick"/>
-                <MenuItem Header="UncertainComplexFlag" Click="ComplexFlag"/>
+                <MenuItem Header="UncertainComplexFlag" Click="UncertainComplexFlag"/>
                 <MenuItem Header="ComplexFlag" Click="ComplexFlag"/>
                 <MenuItem Header="ComplexClick" Click="ComplexClick"/>
                 <MenuItem Header="CompleteAnalyze" Click="CompleteAnalyze"/>

@@ -30,7 +30,7 @@ namespace MineSweeper
             DataContext = VM;
 
         }
-
+        #region first menu one step operation
         private void Restart_Click(object sender, RoutedEventArgs e)//maybe should be in other place
         {
             VM.Restart();
@@ -66,7 +66,42 @@ namespace MineSweeper
             VM.player.SimpleTest(VM.player.CompleteAnalyze);
         }
 
+        private void SealedBlock(object sender, RoutedEventArgs e)
+        {
+            VM.player.SealedBlock();
+        }
+        #endregion
+
+        #region second menu two
         private void SimpleTest(object sender, RoutedEventArgs e)//rare bug??
+        {
+            SimpleSolve();
+        }
+
+        private void ComplexTest(object sender, RoutedEventArgs e)//bug not fixed
+        {
+            bool test = false;
+            while (true)
+            {
+                Console.WriteLine("0");
+                SimpleSolve();
+                Console.WriteLine("1{0}",test);
+                test = test || VM.player.SimpleTest(VM.player.ComplexClick);
+                Console.WriteLine("2{0}", test);
+                test = test || VM.player.SimpleTest(VM.player.ComplexFlag);
+                Console.WriteLine("3{0}", test);
+                test = test || VM.player.SimpleTest(VM.player.UncertainComplexFlag);
+                Console.WriteLine("4{0}", test);
+                test = test || VM.player.SimpleTest(VM.player.CompleteAnalyze);
+                Console.WriteLine("5{0}", test);
+                if (!test)
+                { return; }
+                else { test = false; }
+
+            }
+        }
+
+        private void SimpleSolve()
         {
             bool click = true;
             bool flag = true;
@@ -98,17 +133,9 @@ namespace MineSweeper
 
             }
         }
+        #endregion
 
-        private void ComplexTest(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void SealedBlock(object sender, RoutedEventArgs e)
-        {
-            VM.player.SealedBlock();
-        }
-
+        #region third menu 
         private void Save(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -159,6 +186,6 @@ namespace MineSweeper
 
 
         }
-
+        #endregion
     }
 }

@@ -54,7 +54,7 @@ namespace MineSweeper
         #region constructor
         public MainWindowViewModel()
         {
-            Distribution = game.Generate(10, 15, 15);
+            Distribution = game.Generate(16, 30, 99);
             this.row = game.row;
             this.col = game.col;
             this.mine_number = game.mine_number;
