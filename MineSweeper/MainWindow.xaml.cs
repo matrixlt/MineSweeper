@@ -61,6 +61,11 @@ namespace MineSweeper
             VM.player.SimpleTest(VM.player.ComplexClick);
         }
 
+        private void CompleteAnalyze(object sender, RoutedEventArgs e)
+        {
+            VM.player.SimpleTest(VM.player.CompleteAnalyze);
+        }
+
         private void SimpleTest(object sender, RoutedEventArgs e)//rare bug??
         {
             bool click = true;
@@ -97,6 +102,11 @@ namespace MineSweeper
         private void ComplexTest(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void SealedBlock(object sender, RoutedEventArgs e)
+        {
+            VM.player.SealedBlock();
         }
 
         private void Save(object sender, RoutedEventArgs e)

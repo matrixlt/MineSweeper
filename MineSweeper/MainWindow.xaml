@@ -15,6 +15,8 @@
                 <MenuItem Header="UncertainComplexFlag" Click="ComplexFlag"/>
                 <MenuItem Header="ComplexFlag" Click="ComplexFlag"/>
                 <MenuItem Header="ComplexClick" Click="ComplexClick"/>
+                <MenuItem Header="CompleteAnalyze" Click="CompleteAnalyze"/>
+                <MenuItem Header="SealedBlock" Click="SealedBlock"/>
             </MenuItem>
             <MenuItem Header="test">
                 <MenuItem Header="SimpleTest" Click="SimpleTest"/>

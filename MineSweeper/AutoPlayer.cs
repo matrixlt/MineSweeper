@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Combinatorics.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -157,7 +158,7 @@ namespace MineSweeper
             return false;
         }
 
-        public bool UncertainComplexFlag(int x, int y)//analyze in 3*3+, opt needed
+        public bool UncertainComplexFlag(int x, int y)//analyze in 3*3, opt needed
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -209,7 +210,7 @@ namespace MineSweeper
 
         }
 
-        public bool ComplexFlag(int x, int y)
+        public bool ComplexFlag(int x, int y)//analyze in 3*3
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -258,7 +259,8 @@ namespace MineSweeper
 
             return false;
         }
-        public bool ComplexClick(int x, int y)//analyze in only 3*3,simplified and comfirmed
+
+        public bool ComplexClick(int x, int y)//analyze in 3*3+,simplified and comfirmed
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -307,11 +309,113 @@ namespace MineSweeper
             return false;
         }
 
-        public bool CompleteAnalyze(int x, int y)
+        public bool CompleteAnalyze(int x, int y)//analyze in 5*5+,simplified and comfirmed,test needed
         {
-            return true;
+            List<SolveUnit> units = new List<SolveUnit> { };
+            SolveUnit center = new SolveUnit(mines[x, y].mine_count);
+
+            center.Simplified_blocks = GetBlockSet(x, y, true);
+            center.comfirmed_mine_count = mines[x, y].mine_count - GetInfo(x, y).flag_count;
+
+            for (int i = x - 2; i < x + 3; i++)
+            {
+                for (int j = y - 2; j < y + 3; j++)
+                {
+                    if (inBorder(i, j) && !mines[i, j].is_cover            // in border and is a uncovered number 
+                        && mines[i, j].mine_count != 0 &&(x != i || y != j)//number is not 0 and is not center(x,y)
+                        )
+                    {
+                        SolveUnit edge = new SolveUnit(mines[i, j].mine_count);
+                        edge.Simplified_blocks = GetBlockSet(i, j, true);
+                        edge.comfirmed_mine_count = mines[i, j].mine_count - GetInfo(i, j).flag_count;
+                        if(edge.comfirmed_mine_count != 0)                  //not a empty condition
+                            units.Add(edge);
+                    }
+                }
+            }
+            for (int i = 1; i < units.Count; i++)
+            {
+                Combinations<SolveUnit> combinations = new Combinations<SolveUnit>(units, i);//get all combination
+                foreach (IList<SolveUnit> set in combinations)
+                {
+                    HashSet<Position> solve = new HashSet<Position> { };
+                    int before = 0;
+                    int after = 0;
+                    int real_mine_count = 0;
+                    foreach (SolveUnit su in set)
+                    {
+                        before = solve.Count;
+                        solve.UnionWith(su.Simplified_blocks);//union
+                        after = solve.Count;
+                        if (after - before != su.Simplified_blocks.Count)//intersect not empty
+                        {
+                            break;
+                        }
+                        real_mine_count += su.comfirmed_mine_count;
+                    }
+
+                    if (solve.IsProperSubsetOf(center.Simplified_blocks))//properset
+                    {
+                        int block_diff = center.Simplified_blocks.Count - solve.Count;
+                        int mine_diff = center.comfirmed_mine_count - real_mine_count;
+                        if (mine_diff == 0)
+                        {
+                            center.Simplified_blocks.ExceptWith(solve);
+                            foreach (Position p in center.Simplified_blocks)
+                            {
+                                if (openBlock(p.x, p.y))
+                                    return true;
+                            }
+                        }
+
+                        if (mine_diff > 0 && mine_diff == block_diff)
+                        {
+                            center.Simplified_blocks.ExceptWith(solve);
+                            foreach (Position p in center.Simplified_blocks)
+                            {
+                                mines[p.x, p.y].is_flag = true;
+                                rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                            }
+                            return true;
+                        }
+                    }
+
+                }
+            }
+            return false;
         }
 
+        public bool SealedBlock()
+        {
+            int mine_count = 0;
+            int flag_count = 0;
+            for(int i = 0; i < row; i++)
+            {
+                for(int j = 0;j < col; j++)
+                {
+                    if (mines[i, j].is_mine)
+                        mine_count++;
+                    if (mines[i, j].is_flag)
+                        flag_count++;
+                }
+            }
+
+            if(mine_count == flag_count)
+            {
+                for (int i = 0; i < row; i++)
+                {
+                    for (int j = 0; j < col; j++)
+                    {
+                        if (mines[i, j].is_cover && !mines[i, j].is_flag)
+                            if (openBlock(i, j))
+                                return true;
+                    }
+                }
+                return true;
+            }
+
+            return false;
+        }
         #endregion
 
         #region debug

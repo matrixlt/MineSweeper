@@ -60,8 +60,8 @@ namespace MineSweeper
             this.mine_number = game.mine_number;
 
             Ininitialize(game);
-            Height = 20 * Row;
-            Width = 20 * Col;
+            Height = 25 * Row;
+            Width = 25 * Col;
             player = new AutoPlayer(row, col, Mines, Rectangles);
             player.inBorder = InBorder;
             player.lRClick = LRClick;
@@ -503,8 +503,8 @@ namespace MineSweeper
             this.mine_number = game.mine_number;
 
             Ininitialize(game);
-            Height = 20 * Row;
-            Width = 20 * Col;
+            Height = 25 * Row;
+            Width = 25 * Col;
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
             {
