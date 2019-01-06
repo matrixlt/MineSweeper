@@ -54,7 +54,7 @@ namespace MineSweeper
         public MainWindowViewModel()
         {
             this.row = 10;
-            this.col = 10;
+            this.col = 15;
             this.mine_number = 15;
             Mines = new Mine[row, col];
             Rectangles = new Rectangle[row, col];
@@ -169,7 +169,7 @@ namespace MineSweeper
                 {
                     in_game = false;
                     s.Fill = BlockBrush.mine;
-                    borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
+                    borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
                     dispatcherTimer.Stop();
                     total_time = 0;
                     LoseWindow();
@@ -230,7 +230,7 @@ namespace MineSweeper
             else
             {
                 Rectangles[x, y].Fill = BlockBrush.mine;
-                borders[x * row + y].Background = new SolidColorBrush(Colors.Red);
+                borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
                 LoseWindow();
                 Restart();
                 return true;
@@ -327,8 +327,8 @@ namespace MineSweeper
             }
         }
 
-        public int Row { get; set; }
-        public int Col { get; set; }
+        public int Row { get { return row; }}
+        public int Col { get { return col; }}
         public List<Border> BorderSet { get { return borders; } }
         public string Show_time
         {

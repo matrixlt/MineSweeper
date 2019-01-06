@@ -68,7 +68,7 @@ namespace MineSweeper
             {
                 for (int j = 0; j < col; j++)
                 {
-                    distribution[i, j] = temp[i * row + j];
+                    distribution[i, j] = temp[i * col + j];
                 }
             }
 
