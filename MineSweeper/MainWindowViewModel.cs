@@ -175,6 +175,7 @@ namespace MineSweeper
             {
                 dispatcherTimer.Stop();
                 total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                Left_mine = "000";
                 WinWindow();
                 Restart();
             }
@@ -225,6 +226,7 @@ namespace MineSweeper
             Mines[x, y].is_cover = false;
             if (game.IsFinish(Mines))
             {
+                this.Left_mine = "000";
                 WinWindow();
                 Restart();
                 return true;
@@ -513,6 +515,7 @@ namespace MineSweeper
 
             if (game.IsFinish(Mines))
             {
+                Left_mine = "000";
                 WinWindow();
                 Restart();
             }

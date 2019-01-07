@@ -37,9 +37,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Foreground="Red" Text="{Binding Path=Left_mine}" TextAlignment="Center" FontWeight="Bold" />
-            <Button Grid.Column="1">
-                New
-            </Button>
+            <Button Grid.Column="1" Content="Restart" />
             <TextBlock Grid.Column="2"  Foreground="Red" Text="{Binding Path=Show_time}" TextAlignment="Center" FontWeight="Bold" />
         </Grid>
 
