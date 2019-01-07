@@ -24,8 +24,13 @@ namespace MineSweeper
         private int mine_number;
         private bool both_down = false;
 
+        int mine_size = 25;
+        int height_margin = 100;
+        int width_margin = 50;
         private int height;
         private int width;
+        private int main_height;
+        private int main_width;
         private bool first_interval = true;
         private DateTime start_time;
         private int time_span;
@@ -60,8 +65,10 @@ namespace MineSweeper
             this.mine_number = game.mine_number;
 
             Ininitialize(game);
-            Height = 25 * Row;
-            Width = 25 * Col;
+            Height = mine_size * Row;
+            Width = mine_size * Col;
+            Main_height = Height + height_margin;
+            Main_width = Width + width_margin;
             player = new AutoPlayer(row, col, Mines, Rectangles);
             player.inBorder = InBorder;
             player.lRClick = LRClick;
@@ -360,6 +367,7 @@ namespace MineSweeper
             {
                 height = value;
                 OnPropertyChanged("Height");
+                
             }
         }
         public int Width
@@ -369,8 +377,18 @@ namespace MineSweeper
                 width = value;
                 OnPropertyChanged("Width");
 
+
             }
         }
+
+        public int Main_height { get => main_height; set 
+                { main_height = value;
+                OnPropertyChanged("Main_height");
+            } }
+        public int Main_width { get => main_width; set {
+                main_width = value;
+                OnPropertyChanged("Main_width");
+            } }
         #endregion
 
         #region helpers in class
@@ -521,8 +539,10 @@ namespace MineSweeper
             this.mine_number = game.mine_number;
 
             Ininitialize(game);
-            Height = 25 * Row;
-            Width = 25 * Col;
+            Height = mine_size * Row;
+            Width = mine_size * Col;
+            Main_height = Height + height_margin;
+            Main_width = Width + width_margin;
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
             {
@@ -551,8 +571,10 @@ namespace MineSweeper
             this.mine_number = game.mine_number;
 
             Ininitialize(game);
-            Height = 25 * Row;
-            Width = 25 * Col;
+            Height = mine_size * Row;
+            Width = mine_size * Col;
+            Main_height = Height + height_margin;
+            Main_width = Width + width_margin;
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
             {

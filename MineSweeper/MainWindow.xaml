@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
-        Title="MainWindow" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="MainWindow"  ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        MaxHeight="{Binding Main_height}" MaxWidth="{Binding Main_width}">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="new">
