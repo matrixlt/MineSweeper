@@ -8,6 +8,7 @@ namespace MineSweeper
 {
     public class Game
     {
+        private Random random;
         public static int id = 0;
         public bool is_over;
         public bool win;
@@ -18,6 +19,7 @@ namespace MineSweeper
 
         public int[,] distribution = null;
 
+        public Random Random { get => random; set => random = value; }
 
         public Game()
         {
@@ -45,14 +47,14 @@ namespace MineSweeper
             mine_number = count;
         }
 
-        public static void Shuffle(int[] list)
+        public void Shuffle(int[] list)
         {
-            Random random = new Random();
+            //Random random = new Random();
             int n = list.Length;
 
             for (int i = list.Length - 1; i > 1; i--)
             {
-                int rnd = random.Next(i + 1);
+                int rnd = Random.Next(i + 1);
 
                 int value = list[rnd];
                 list[rnd] = list[i];

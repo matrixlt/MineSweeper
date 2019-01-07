@@ -91,14 +91,45 @@ namespace MineSweeper
 
         private void AutoTest(object sender, RoutedEventArgs e)
         {
-            if(!VM.In_game)
+            if (!VM.In_game)
                 VM.player.RandomClick();
             while (VM.In_game)
             {
                 ComplexSolve();
-                if(VM.In_game)
+                if (VM.In_game)
                     VM.player.RandomClick();
             }
+        }
+
+        private void AutoTest100(object sender, RoutedEventArgs e)
+        {
+            VM.Test_mode = true;
+            int win = 0;
+            int lose = 0;
+            for(int i = 0; i < 1000; i++)
+            {
+                if (!VM.In_game)
+                    VM.player.RandomClick();
+                while (VM.In_game)
+                {
+                    SimpleSolve();
+                    ComplexSolve();
+                    SimpleSolve();
+                    if (VM.In_game)
+                        VM.player.RandomClick();
+                    
+                }
+                if(VM.Last_win == true)
+                {
+                    win++;
+                }else if(VM.Last_win == false)
+                {
+                    lose++;
+                }
+                Console.WriteLine("COUNT {0}",i);
+            }
+            VM.Test_mode = false;
+            Console.WriteLine("WIN {0}   LOSE {1}", win, lose);
         }
 
         private void SimpleSolve()
@@ -190,7 +221,7 @@ namespace MineSweeper
             {
                 // Save document
                 string filename = dlg.FileName;
-                SaveAndLoad.Save(VM.row, VM.col, VM.distribution, filename);
+                SaveAndLoad.Save(VM.Row, VM.Col, VM.distribution, filename);
             }
 
 

@@ -18,15 +18,16 @@ namespace MineSweeper
         #region private members
         private bool in_game = false;
         private bool first_click = true;
-
-        public int row;
-        public int col;
+        private bool? last_win = null;
+        private bool test_mode = false;
+        private int row;
+        private int col;
         private int mine_number;
         private bool both_down = false;
 
-        int mine_size = 25;
-        int height_margin = 150;
-        int width_margin = 75;
+        private int mine_size = 25;
+        private int height_margin = 150;
+        private int width_margin = 75;
         private int height;
         private int width;
         private int main_height;
@@ -37,6 +38,7 @@ namespace MineSweeper
         private double total_time;
         private string show_time = "000";
 
+        private Random random = new Random(DateTime.Now.Millisecond+97);
         private int elapse_time;
         private DispatcherTimer dispatcherTimer = new DispatcherTimer();
         #endregion
@@ -50,7 +52,7 @@ namespace MineSweeper
         Rectangle[,] rectangles = null;
         BlockBrush myBrush = new BlockBrush();
 
-        Game game = new Game();
+        Game game = null;
 
         public delegate bool AutoPlay(int x, int y);
         public AutoPlayer player;
@@ -59,11 +61,13 @@ namespace MineSweeper
         #region constructor
         public MainWindowViewModel()
         {
-            Distribution = game.Generate(16, 30, 99);
+            game = new Game();
+            game.Random = random;
+            Distribution = game.Generate(16, 16, 40);
             this.row = game.row;
             this.col = game.col;
             this.mine_number = game.mine_number;
-
+            
             Ininitialize(game);
             Height = mine_size * Row;
             Width = mine_size * Col;
@@ -216,7 +220,7 @@ namespace MineSweeper
                 dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
                 dispatcherTimer.Start();
-                if (mines[x,y].is_mine)
+                if (mines[x, y].is_mine)
                 {
                     Restart(x, y);
                     return true;
@@ -411,6 +415,8 @@ namespace MineSweeper
         }
 
         public bool In_game { get => in_game; set => in_game = value; }
+        public bool? Last_win { get => last_win; set => last_win = value; }
+        public bool Test_mode { get => test_mode; set => test_mode = value; }
         #endregion
 
         #region helpers in class
@@ -468,8 +474,11 @@ namespace MineSweeper
             return (x >= 0 && x < row && y >= 0 && y < col);
         }
 
-        public void WinWindow()
+        public void WinWindow()//attention ! not just a window
         {
+            Last_win = true;
+            if (Test_mode)
+                return;
             string messageBoxText = "You just win !";
             string caption = "Minesweeper";
             MessageBoxButton button = MessageBoxButton.OK;
@@ -479,6 +488,9 @@ namespace MineSweeper
 
         public void LoseWindow()
         {
+            Last_win = false;
+            if (Test_mode)
+                return;
             string messageBoxText = "You just hit a mine!";
             string caption = "Minesweeper";
             MessageBoxButton button = MessageBoxButton.OK;
@@ -505,6 +517,7 @@ namespace MineSweeper
             }
 
             game = new Game();
+            game.Random = random;
             Distribution = game.Generate(row, col, mine_number);
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
@@ -523,6 +536,7 @@ namespace MineSweeper
             while (game.GetMineCount(x, y) == -1)
             {
                 game = new Game();
+                game.Random = random;
                 Distribution = game.Generate(row, col, mine_number);
             }
             for (int i = 0; i < row; i++)
@@ -556,6 +570,7 @@ namespace MineSweeper
             this.Show_time = "000";
 
             game = new Game(distribution);
+            game.Random = random;
             Row = game.row;
             Col = game.col;
             this.mine_number = game.mine_number;
@@ -587,6 +602,7 @@ namespace MineSweeper
             this.Show_time = "000";
 
             game = new Game();
+            game.Random = random;
             Distribution = game.Generate(row, col, mine_count);
             Row = game.row;
             Col = game.col;

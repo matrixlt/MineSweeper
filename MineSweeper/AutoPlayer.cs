@@ -447,7 +447,7 @@ namespace MineSweeper
                     }
                     end:;
                 }
-                
+
             }
             return false;
         }
@@ -483,15 +483,15 @@ namespace MineSweeper
 
             return false;
         }
-        
+
         public void RandomClick()
         {
-            var all_possible = new List<Position>{ };
-            for(int x = 0; x < row; x++)
+            var all_possible = new List<Position> { };
+            for (int x = 0; x < row; x++)
             {
-                for(int y = 0; y< col; y++)
+                for (int y = 0; y < col; y++)
                 {
-                    if(mines[x,y].is_cover && !mines[x, y].is_flag)
+                    if (mines[x, y].is_cover && !mines[x, y].is_flag)
                     {
                         all_possible.Add(new Position(x, y));
                     }
@@ -499,7 +499,7 @@ namespace MineSweeper
             }
 
             int choose = random.Next(0, all_possible.Count);
-            if(all_possible.Count == 0)
+            if (all_possible.Count == 0)
             {
                 return;
             }

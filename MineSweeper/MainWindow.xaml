@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
         Title="MainWindow"  ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        MaxHeight="{Binding Main_height}" MaxWidth="{Binding Main_width}">
+        MaxHeight="{Binding Main_height}"  MinHeight ="{Binding Main_height}" 
+        MaxWidth="{Binding Main_width}" MinWidth="{Binding Main_width}">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Game">
@@ -27,6 +28,7 @@
                 <MenuItem Header="SimpleTest" Click="SimpleTest"/>
                 <MenuItem Header="ComplexTest" Click="ComplexTest"/>
                 <MenuItem Header="AutoTest" Click="AutoTest"/>
+                <MenuItem Header="AutoTest100" Click="AutoTest100"/>
             </MenuItem>
             <MenuItem Header="File">
                 <MenuItem Header="Save" Click="Save"/>
