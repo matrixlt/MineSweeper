@@ -534,6 +534,35 @@ namespace MineSweeper
             }
 
         }
+
+        public void Restart(int row, int col, int mine_count)
+        {
+            in_game = false;
+            first_click = true;
+            first_interval = true;
+
+            dispatcherTimer.Stop();
+            this.Show_time = "000";
+
+            game = new Game();
+            Distribution = game.Generate(row, col, mine_count);
+            Row = game.row;
+            Col = game.col;
+            this.mine_number = game.mine_number;
+
+            Ininitialize(game);
+            Height = 25 * Row;
+            Width = 25 * Col;
+            player.SetProperties(row, col, Mines, Rectangles);
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    Mine mymine = new Mine(game.GetMineCount(i, j));
+                    Mines[i, j] = mymine;
+                }
+            }
+        }
         #endregion
     }
 }

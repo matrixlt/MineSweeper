@@ -34,16 +34,16 @@ namespace MineSweeper
 
         private int Rows
         {
-            get { return int.Parse(rowsSetting.Text);}
+            get { return int.Parse(rowsSetting.Text); }
             set { rowsSetting.Text = Convert.ToString(value); }
         }
 
         private int Cols
         {
-            get { return int.Parse(rowsSetting.Text);}
+            get { return int.Parse(rowsSetting.Text); }
             set { rowsSetting.Text = Convert.ToString(value); }
         }
-        
+
         private int Mines
         {
             get { return int.Parse(minesSetting.Text); }

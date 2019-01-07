@@ -341,7 +341,7 @@ namespace MineSweeper
                     }
                 }
             }
-            for (int i = 1; i < units.Count+1; i++)
+            for (int i = 1; i < units.Count + 1; i++)
             {
                 Combinations<SolveUnit> combinations = new Combinations<SolveUnit>(units, i);//get all combination
                 foreach (IList<SolveUnit> set in combinations)
@@ -377,7 +377,7 @@ namespace MineSweeper
                                     openEmpty(p.x, p.y);
                                     return true;
                                 }
-                                    
+
                                 else
                                 {
                                     if (openBlock(p.x, p.y))
@@ -399,7 +399,7 @@ namespace MineSweeper
                             return true;
                         }
                     }
-                    else if(!solve.SetEquals(center.Simplified_blocks))//not properset, not equal
+                    else if (!solve.SetEquals(center.Simplified_blocks))//not properset, not equal
                     {
                         int mine_diff = real_mine_count - center.comfirmed_mine_count;
                         if (mine_diff > 0)
@@ -420,11 +420,11 @@ namespace MineSweeper
 
                             }
                         }
-                        else if(mine_diff < 0)
+                        else if (mine_diff < 0)
                         {
                             center.Simplified_blocks.ExceptWith(solve);
                             int block_diff = center.Simplified_blocks.Count;
-                            if(block_diff == -mine_diff)
+                            if (block_diff == -mine_diff)
                             {
                                 foreach (Position p in center.Simplified_blocks)
                                 {

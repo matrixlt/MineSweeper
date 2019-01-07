@@ -85,7 +85,7 @@ namespace MineSweeper
             {
                 Console.WriteLine("0");
                 SimpleSolve();
-                Console.WriteLine("1{0}",test);
+                Console.WriteLine("1{0}", test);
                 test = test || VM.player.SimpleTest(VM.player.ComplexClick);
                 Console.WriteLine("2{0}", test);
                 test = test || VM.player.SimpleTest(VM.player.ComplexFlag);
@@ -144,10 +144,10 @@ namespace MineSweeper
                 VM.Col = int.Parse(settingWindow.colsSetting.Text);
                 VM.Row = int.Parse(settingWindow.rowsSetting.Text);
                 VM.Mine_number = int.Parse(settingWindow.minesSetting.Text);
-                VM.Height = 35 * VM.Row;
-                VM.Width = 35 * VM.Col;
+                VM.Height = 25 * VM.Row;
+                VM.Width = 25 * VM.Col;
                 settingWindow.Close();
-                VM.Restart(); //need to change the Distribution[,]
+                VM.Restart(VM.Row, VM.Col, VM.Mine_number); //need to change the Distribution[,]
             }
         }
 
