@@ -158,7 +158,7 @@ namespace MineSweeper
             return false;
         }
 
-        public bool UncertainComplexFlag(int x, int y)//analyze in 3*3, opt needed,true bug
+        public bool UncertainComplexFlag(int x, int y)//analyze in 3*3, opt needed
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -199,14 +199,19 @@ namespace MineSweeper
 
                 if (diff == diff_block && diff > 0)
                 {
+                    bool test = false;
                     center.Blocks.ExceptWith(units[i].Blocks);
                     CheckSet(center.Blocks);
                     foreach (Position p in center.Blocks)
                     {
-                        mines[p.x, p.y].is_flag = true;
-                        rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                        if (!mines[p.x, p.y].is_flag)
+                        {
+                            mines[p.x, p.y].is_flag = true;
+                            rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                            test = true;
+                        }
                     }
-                    return true;
+                    return test;
                 }
             }
             return false;
@@ -336,7 +341,7 @@ namespace MineSweeper
                     }
                 }
             }
-            for (int i = 1; i < units.Count; i++)
+            for (int i = 1; i < units.Count+1; i++)
             {
                 Combinations<SolveUnit> combinations = new Combinations<SolveUnit>(units, i);//get all combination
                 foreach (IList<SolveUnit> set in combinations)
