@@ -26,14 +26,17 @@ namespace MineSweeper
 
         private int height;
         private int width;
+
         private bool first_interval = true;
         private DateTime start_time;
         private int time_span;
         private double total_time;
         private string show_time = "000";
-
         private int elapse_time;
         private DispatcherTimer dispatcherTimer = new DispatcherTimer();
+
+        private int count_flag = 0;
+        private string left_mine;
         #endregion
 
         #region other member
@@ -58,6 +61,7 @@ namespace MineSweeper
             this.row = game.row;
             this.col = game.col;
             this.mine_number = game.mine_number;
+            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
 
             Ininitialize(game);
             Height = 25 * Row;
@@ -187,13 +191,19 @@ namespace MineSweeper
             {
                 if (mine.is_flag)
                 {
+                    this.Count_flag -= 1;
+                    this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
                     mine.is_flag = false;
                     s.Fill = Brushes.AliceBlue;
+                    //Console.WriteLine(this.Left_mine);
                 }
                 else
                 {
+                    this.Count_flag += 1;
+                    this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
                     mine.is_flag = true;
                     s.Fill = BlockBrush.flag;
+                    //Console.WriteLine(this.Left_mine);
                 }
             }
         }
@@ -291,7 +301,6 @@ namespace MineSweeper
                         this.Show_time = Convert.ToInt64(time_span).ToString("D3");
                     }
                 }
-                //Console.WriteLine(show_time);
             }
         }
 
@@ -361,6 +370,17 @@ namespace MineSweeper
 
             }
         }
+
+        public string Left_mine
+        {
+            get => left_mine;
+            set
+            {
+                left_mine = value;
+                OnPropertyChanged("Left_mine");
+            }
+        }
+        public int Count_flag { get => count_flag; set => count_flag = value; }
         #endregion
 
         #region helpers in class
@@ -455,6 +475,8 @@ namespace MineSweeper
             }
 
             game = new Game();
+            this.Count_flag = 0;
+            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
             Distribution = game.Generate(row, col, mine_number);
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
@@ -508,7 +530,8 @@ namespace MineSweeper
             game = new Game(distribution);
             Row = game.row;
             Col = game.col;
-            this.mine_number = game.mine_number;
+            this.Count_flag = 0;
+            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
 
             Ininitialize(game);
             Height = 25 * Row;
