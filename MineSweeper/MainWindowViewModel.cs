@@ -322,6 +322,16 @@ namespace MineSweeper
                 OnPropertyChanged("Col");
             }
         }
+        //LZS adding Mine_number
+        public int Mine_number
+        {
+            get { return mine_number; }
+            set
+            {
+                mine_number = value;
+                OnPropertyChanged("Mine_number");
+            }
+        }
         public List<Border> BorderSet
         {
             get { return borders; }

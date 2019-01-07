@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MineSweeper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="850" ResizeMode="NoResize">
+        Title="MainWindow" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="new">
@@ -26,6 +26,7 @@
                 <MenuItem Header="Save" Click="Save"/>
                 <MenuItem Header="Load" Click="Load"/>
             </MenuItem>
+            <MenuItem Header="Set" Click="SettingClick"/>
         </Menu>
         <Grid DockPanel.Dock="Top" >
             <Grid.RowDefinitions>

@@ -135,6 +135,25 @@ namespace MineSweeper
         }
         #endregion
 
+        #region LZS adding settingWindow
+        private void SettingClick(object sender, RoutedEventArgs e)
+        {
+            SettingWindow settingWindow = new SettingWindow(VM.Row, VM.Col, VM.Mine_number);
+            if (settingWindow.ShowDialog() == true)
+            {
+                VM.Col = int.Parse(settingWindow.colsSetting.Text);
+                VM.Row = int.Parse(settingWindow.rowsSetting.Text);
+                VM.Mine_number = int.Parse(settingWindow.minesSetting.Text);
+                VM.Height = 35 * VM.Row;
+                VM.Width = 35 * VM.Col;
+                settingWindow.Close();
+                VM.Restart(); //need to change the Distribution[,]
+            }
+        }
+
+
+        #endregion
+
         #region third menu 
         private void Save(object sender, RoutedEventArgs e)
         {
