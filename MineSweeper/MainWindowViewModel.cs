@@ -25,8 +25,8 @@ namespace MineSweeper
         private bool both_down = false;
 
         int mine_size = 25;
-        int height_margin = 100;
-        int width_margin = 50;
+        int height_margin = 150;
+        int width_margin = 75;
         private int height;
         private int width;
         private int main_height;
@@ -134,7 +134,7 @@ namespace MineSweeper
 
             if (first_click)
             {                                       //TODO start a game or modify sth ,start the timer or sth
-                in_game = true;
+                In_game = true;
                 first_click = false;
                 dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
@@ -151,7 +151,7 @@ namespace MineSweeper
             {
                 if (mine.is_mine)
                 {
-                    in_game = false;
+                    In_game = false;
                     s.Fill = BlockBrush.mine;
                     borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
                     dispatcherTimer.Stop();
@@ -209,6 +209,21 @@ namespace MineSweeper
         #region block operation
         public bool OpenBlock(int x, int y)
         {
+            if (first_click)
+            {                                       //TODO start a game or modify sth ,start the timer or sth
+                In_game = true;
+                first_click = false;
+                dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
+                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
+                dispatcherTimer.Start();
+                if (mines[x,y].is_mine)
+                {
+                    Restart(x, y);
+                    return true;
+                }
+
+            }
+
             if (!Mines[x, y].is_mine)
                 Rectangles[x, y].Fill = BlockBrush.numbers[Mines[x, y].mine_count];
             else
@@ -367,7 +382,6 @@ namespace MineSweeper
             {
                 height = value;
                 OnPropertyChanged("Height");
-                
             }
         }
         public int Width
@@ -376,19 +390,27 @@ namespace MineSweeper
             {
                 width = value;
                 OnPropertyChanged("Width");
-
-
             }
         }
 
-        public int Main_height { get => main_height; set 
-                { main_height = value;
+        public int Main_height
+        {
+            get => main_height; set
+            {
+                main_height = value;
                 OnPropertyChanged("Main_height");
-            } }
-        public int Main_width { get => main_width; set {
+            }
+        }
+        public int Main_width
+        {
+            get => main_width; set
+            {
                 main_width = value;
                 OnPropertyChanged("Main_width");
-            } }
+            }
+        }
+
+        public bool In_game { get => in_game; set => in_game = value; }
         #endregion
 
         #region helpers in class
@@ -466,7 +488,7 @@ namespace MineSweeper
 
         public void Restart()                           //much more things to do,such as frash AutoPlayer
         {
-            in_game = false;
+            In_game = false;
             first_click = true;
             first_interval = true;
 
@@ -526,7 +548,7 @@ namespace MineSweeper
 
         public void Restart(int[,] distribution)
         {
-            in_game = false;
+            In_game = false;
             first_click = true;
             first_interval = true;
 
@@ -557,7 +579,7 @@ namespace MineSweeper
 
         public void Restart(int row, int col, int mine_count)
         {
-            in_game = false;
+            In_game = false;
             first_click = true;
             first_interval = true;
 

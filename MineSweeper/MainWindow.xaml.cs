@@ -30,7 +30,8 @@ namespace MineSweeper
             DataContext = VM;
 
         }
-        #region first menu one step operation
+
+        #region AutoPlay
         private void Restart_Click(object sender, RoutedEventArgs e)//maybe should be in other place
         {
             VM.Restart();
@@ -70,9 +71,14 @@ namespace MineSweeper
         {
             VM.player.SealedBlock();
         }
+
+        private void RandomClick(object sender, RoutedEventArgs e)
+        {
+            VM.player.RandomClick();
+        }
         #endregion
 
-        #region second menu two
+        #region AutoTest
         private void SimpleTest(object sender, RoutedEventArgs e)//rare bug??
         {
             SimpleSolve();
@@ -80,24 +86,18 @@ namespace MineSweeper
 
         private void ComplexTest(object sender, RoutedEventArgs e)//bug not fixed
         {
-            bool test = false;
-            while (true)
-            {
-                Console.WriteLine("0");
-                SimpleSolve();
-                Console.WriteLine("1{0}", test);
-                test = test || VM.player.SimpleTest(VM.player.ComplexClick);
-                Console.WriteLine("2{0}", test);
-                test = test || VM.player.SimpleTest(VM.player.ComplexFlag);
-                Console.WriteLine("3{0}", test);
-                test = test || VM.player.SimpleTest(VM.player.UncertainComplexFlag);
-                Console.WriteLine("4{0}", test);
-                test = test || VM.player.SimpleTest(VM.player.CompleteAnalyze);
-                Console.WriteLine("5{0}", test);
-                if (!test)
-                { return; }
-                else { test = false; }
+            ComplexSolve();
+        }
 
+        private void AutoTest(object sender, RoutedEventArgs e)
+        {
+            if(!VM.In_game)
+                VM.player.RandomClick();
+            while (VM.In_game)
+            {
+                ComplexSolve();
+                if(VM.In_game)
+                    VM.player.RandomClick();
             }
         }
 
@@ -129,7 +129,28 @@ namespace MineSweeper
                 i++;
                 if (record_click == count_click && record_flag == count_flag)
                     break;
+            }
+        }
 
+        private void ComplexSolve()
+        {
+            bool test = false;
+            while (true)
+            {
+                Console.WriteLine("0");
+                SimpleSolve();
+                Console.WriteLine("1{0}", test);
+                test = test || VM.player.SimpleTest(VM.player.ComplexClick);
+                Console.WriteLine("2{0}", test);
+                test = test || VM.player.SimpleTest(VM.player.ComplexFlag);
+                Console.WriteLine("3{0}", test);
+                test = test || VM.player.SimpleTest(VM.player.UncertainComplexFlag);
+                Console.WriteLine("4{0}", test);
+                test = test || VM.player.SimpleTest(VM.player.CompleteAnalyze);
+                Console.WriteLine("5{0}", test);
+                if (!test)
+                { return; }
+                else { test = false; }
 
             }
         }

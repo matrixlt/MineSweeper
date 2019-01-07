@@ -9,8 +9,11 @@
         MaxHeight="{Binding Main_height}" MaxWidth="{Binding Main_width}">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="new">
+            <MenuItem Header="Game">
                 <MenuItem Header="Restart" Click="Restart_Click"/>
+                <MenuItem Header="Customized Game" Click="SettingClick"/>
+            </MenuItem>
+            <MenuItem Header="AutoPlay">
                 <MenuItem Header="SimpleFlag" Click="SimpleFlag"/>
                 <MenuItem Header="SimpleClick" Click="SimpleClick"/>
                 <MenuItem Header="UncertainComplexFlag" Click="UncertainComplexFlag"/>
@@ -18,16 +21,18 @@
                 <MenuItem Header="ComplexClick" Click="ComplexClick"/>
                 <MenuItem Header="CompleteAnalyze" Click="CompleteAnalyze"/>
                 <MenuItem Header="SealedBlock" Click="SealedBlock"/>
+                <MenuItem Header="RandomClick" Click="RandomClick"/>
             </MenuItem>
-            <MenuItem Header="test">
+            <MenuItem Header="AutoTest">
                 <MenuItem Header="SimpleTest" Click="SimpleTest"/>
                 <MenuItem Header="ComplexTest" Click="ComplexTest"/>
+                <MenuItem Header="AutoTest" Click="AutoTest"/>
             </MenuItem>
-            <MenuItem Header="file">
+            <MenuItem Header="File">
                 <MenuItem Header="Save" Click="Save"/>
                 <MenuItem Header="Load" Click="Load"/>
             </MenuItem>
-            <MenuItem Header="Set" Click="SettingClick"/>
+
         </Menu>
         <Grid DockPanel.Dock="Top" >
             <Grid.RowDefinitions>

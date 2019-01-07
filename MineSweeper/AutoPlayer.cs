@@ -14,6 +14,7 @@ namespace MineSweeper
         private int col;
         Mine[,] mines = null;
         Rectangle[,] rectangles = null;
+        Random random = new Random(DateTime.Now.Millisecond);
 
         public delegate bool AutoPlay(int x, int y);
         public delegate bool InBorder(int x, int y);
@@ -481,6 +482,34 @@ namespace MineSweeper
             }
 
             return false;
+        }
+        
+        public void RandomClick()
+        {
+            var all_possible = new List<Position>{ };
+            for(int x = 0; x < row; x++)
+            {
+                for(int y = 0; y< col; y++)
+                {
+                    if(mines[x,y].is_cover && !mines[x, y].is_flag)
+                    {
+                        all_possible.Add(new Position(x, y));
+                    }
+                }
+            }
+
+            int choose = random.Next(0, all_possible.Count);
+            if(all_possible.Count == 0)
+            {
+                return;
+            }
+            else
+            {
+                if (mines[all_possible[choose].x, all_possible[choose].y].mine_count == 0)
+                    openEmpty(all_possible[choose].x, all_possible[choose].y);
+                else openBlock(all_possible[choose].x, all_possible[choose].y);
+            }
+
         }
         #endregion
 
