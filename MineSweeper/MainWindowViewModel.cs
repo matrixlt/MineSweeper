@@ -83,6 +83,7 @@ namespace MineSweeper
             player.lRClick = LRClick;
             player.openBlock = OpenBlock;
             player.openEmpty = OpenEmpty;
+            player.flagBlock = FlagBlock;
         }
         #endregion
 
@@ -214,8 +215,7 @@ namespace MineSweeper
                 {
                     this.Count_flag += 1;
                     Left_mine = (Mine_number - Count_flag).ToString("D3");
-                    mine.is_flag = true;
-                    s.Fill = BlockBrush.flag;
+                    FlagBlock(x, y);
                     //Console.WriteLine(this.Left_mine);
                 }
             }
@@ -284,7 +284,7 @@ namespace MineSweeper
             }
         }
 
-        public void LRClick(int x, int y)//in or lose in it
+        public void LRClick(int x, int y)//win or lose in it
         {
             for (int i = x - 1; i < x + 2; i++)
             {
@@ -302,6 +302,14 @@ namespace MineSweeper
 
                 }
             }
+        }
+
+        public void FlagBlock(int x, int y)//one way, just flag, not include unflag
+        {
+            Mines[x, y].is_flag = true;
+            if (test_mode)
+                return;
+            Rectangles[x, y].Fill = BlockBrush.flag;
         }
         #endregion
 

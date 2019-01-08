@@ -76,6 +76,16 @@ namespace MineSweeper
         {
             VM.player.RandomClick();
         }
+
+        private void ChooseGame(object sender, RoutedEventArgs e)
+        {
+            if (sender == beginner)
+                VM.Restart(8, 8, 10);
+            if (sender == intermediate)
+                VM.Restart(16, 16, 40);
+            if (sender == expert)
+                VM.Restart(16, 30, 99);
+        }
         #endregion
 
         #region AutoTest

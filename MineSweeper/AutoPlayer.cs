@@ -21,11 +21,13 @@ namespace MineSweeper
         public delegate void LRClick(int x, int y);
         public delegate bool OpenBlock(int x, int y);
         public delegate void OpenEmpty(int x, int y);
+        public delegate void FlagBlock(int x, int y);
 
         public InBorder inBorder;
         public LRClick lRClick;
         public OpenBlock openBlock;
         public OpenEmpty openEmpty;
+        public FlagBlock flagBlock;
 
         public AutoPlayer(int row, int col, Mine[,] mines, Rectangle[,] rectangles)
         {
@@ -133,8 +135,7 @@ namespace MineSweeper
                     {
                         if (inBorder(i, j) && mines[i, j].is_cover)
                         {
-                            mines[i, j].is_flag = true;
-                            rectangles[i, j].Fill = BlockBrush.flag;
+                            flagBlock(i, j);
                         }
                     }
                 }
@@ -207,8 +208,7 @@ namespace MineSweeper
                     {
                         if (!mines[p.x, p.y].is_flag)
                         {
-                            mines[p.x, p.y].is_flag = true;
-                            rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                            flagBlock(p.x, p.y);
                             test = true;
                         }
                     }
@@ -253,8 +253,7 @@ namespace MineSweeper
                     {
                         foreach (Position p in center.Simplified_blocks)
                         {
-                            mines[p.x, p.y].is_flag = true;
-                            rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                            flagBlock(p.x, p.y);
                         }
                     }
                     else
@@ -397,8 +396,7 @@ namespace MineSweeper
                             foreach (Position p in center.Simplified_blocks)
                             {
                                 //Console.WriteLine("11111111111111111111111111111");
-                                mines[p.x, p.y].is_flag = true;
-                                rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                                flagBlock(p.x, p.y);
                             }
                             return true;
                         }
@@ -416,7 +414,7 @@ namespace MineSweeper
                             solve.ExceptWith(center.Simplified_blocks);
                             foreach (Position p in solve)
                             {
-                                Console.WriteLine("11111111111111111111111111111 {0} {1}",x,y);
+                                Console.WriteLine("11111111111111111111111111111 {0} {1}", x, y);
                                 if (mines[p.x, p.y].mine_count == 0)
                                 {
                                     openEmpty(p.x, p.y);
@@ -440,8 +438,7 @@ namespace MineSweeper
                             foreach (Position p in solve)
                             {
                                 //Console.WriteLine("11111111111111111111111111111");
-                                mines[p.x, p.y].is_flag = true;
-                                rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                                flagBlock(p.x, p.y);
                             }
                             return true;
                         }
@@ -462,8 +459,7 @@ namespace MineSweeper
                                     foreach (Position p in new_set)
                                     {
                                         //Console.WriteLine("22222222222222222222222222222");
-                                        mines[p.x, p.y].is_flag = true;
-                                        rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                                        flagBlock(p.x, p.y);
                                     }
                                     return true;
                                 }//bug here
@@ -482,8 +478,7 @@ namespace MineSweeper
                                 foreach (Position p in new_set)
                                 {
                                     //Console.WriteLine("3333333333333333333333333333333333 {0} {1}",x,y);
-                                    mines[p.x, p.y].is_flag = true;
-                                    rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                                    flagBlock(p.x, p.y);
                                 }
                                 return true;
                             }

@@ -13,6 +13,10 @@
             <MenuItem Header="Game">
                 <MenuItem Header="Restart" Click="Restart_Click"/>
                 <MenuItem Header="Customized Game" Click="SettingClick"/>
+                <Separator />
+                <MenuItem Header="Beginner" Name="beginner" Click="ChooseGame"/>
+                <MenuItem Header="Intermediate" Name="intermediate" Click="ChooseGame"/>
+                <MenuItem Header="Expert" Name="expert" Click="ChooseGame"/>
             </MenuItem>
             <MenuItem Header="AutoPlay">
                 <MenuItem Header="SimpleFlag" Click="SimpleFlag"/>
