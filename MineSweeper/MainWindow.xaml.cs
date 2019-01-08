@@ -109,6 +109,11 @@ namespace MineSweeper
             VM.player.SealedBlock();
         }
 
+        private void CenterButtonRestart(object sender, RoutedEventArgs e)
+        {
+            VM.Restart();
+        }
+
         private void Save(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
