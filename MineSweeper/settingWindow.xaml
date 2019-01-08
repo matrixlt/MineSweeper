@@ -1,0 +1,47 @@
+﻿<Window x:Class="MineSweeper.SettingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MineSweeper"
+        mc:Ignorable="d"
+        Title="settingWindow" MinWidth="200" SizeToContent="WidthAndHeight" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" 
+                   FontSize="20" 
+                   VerticalAlignment="Center" HorizontalAlignment="Center">Rows</TextBlock>
+        <TextBox Grid.Row="0" Grid.Column="1" 
+                 x:Name="rowsSetting" FontSize="20" 
+                 VerticalAlignment="Center" HorizontalAlignment="Center"
+                 Width="50" Text="10"></TextBox>
+        <TextBlock Grid.Row="1" Grid.Column="0" 
+                   FontSize="20"
+                   VerticalAlignment="Center" HorizontalAlignment="Center">Cols</TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1"
+                 x:Name="colsSetting" FontSize="20"
+                 VerticalAlignment="Center" HorizontalAlignment="Center"
+                 Width="50" Text="10"></TextBox>
+        <TextBlock Grid.Row="2" Grid.Column="0"
+                   FontSize="20"
+                   VerticalAlignment="Center" HorizontalAlignment="Center">Mines</TextBlock>
+        <TextBox Grid.Row="2" Grid.Column="1"
+                 x:Name="minesSetting" FontSize="20"
+                 VerticalAlignment="Center" HorizontalAlignment="Center"
+                 Width="50" Text="10"></TextBox>
+        <Button Grid.Row="3" Grid.ColumnSpan="2"
+                Name="confirmSetting" Height="30" FontSize="20"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Click="ConfirmButton">Comfirm</Button>
+    </Grid>
+
+</Window>

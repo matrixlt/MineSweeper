@@ -167,7 +167,8 @@ namespace MineSweeper
             {
                 for (int j = y - 1; j < y + 2; j++)
                 {
-                    if (inBorder(i, j) && !mines[i, j].is_cover)
+                    if (inBorder(i, j) && !mines[i, j].is_cover         //in border and a uncovered number
+                        && mines[i, j].mine_count != 0 && (x != i || y != j))//number not 0 and block not center
                     {
                         SolveUnit edge = new SolveUnit(mines[i, j].mine_count);
                         for (int m = i - 1; m < i + 2; m++)
@@ -195,15 +196,22 @@ namespace MineSweeper
             {
                 int diff = center.mine_count - units[i].mine_count;//at least diff mines
                 int diff_block = center.Blocks.Count - units[i].Blocks.Count;
-                if (diff == diff_block)
+
+                if (diff == diff_block && diff > 0)
                 {
+                    bool test = false;
                     center.Blocks.ExceptWith(units[i].Blocks);
+                    //CheckSet(center.Blocks);
                     foreach (Position p in center.Blocks)
                     {
-                        mines[p.x, p.y].is_flag = true;
-                        rectangles[p.x, p.y].Fill = BlockBrush.flag;
-                        return true;
+                        if (!mines[p.x, p.y].is_flag)
+                        {
+                            mines[p.x, p.y].is_flag = true;
+                            rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                            test = true;
+                        }
                     }
+                    return test;
                 }
             }
             return false;
@@ -333,10 +341,11 @@ namespace MineSweeper
                     }
                 }
             }
-            for (int i = 1; i < units.Count; i++)
+
+            for (int i = 1; i < units.Count + 1; i++)//get all combination
             {
-                Combinations<SolveUnit> combinations = new Combinations<SolveUnit>(units, i);//get all combination
-                foreach (IList<SolveUnit> set in combinations)
+                Combinations<SolveUnit> combinations = new Combinations<SolveUnit>(units, i);
+                foreach (IList<SolveUnit> set in combinations)                      //for combianation-i set      
                 {
                     HashSet<Position> solve = new HashSet<Position> { };
                     int before = 0;
@@ -349,38 +358,95 @@ namespace MineSweeper
                         after = solve.Count;
                         if (after - before != su.Simplified_blocks.Count)//intersect not empty
                         {
-                            break;
+                            goto end;
                         }
                         real_mine_count += su.comfirmed_mine_count;
                     }
-
+                    //CheckSet(solve);
                     if (solve.IsProperSubsetOf(center.Simplified_blocks))//properset
                     {
                         int block_diff = center.Simplified_blocks.Count - solve.Count;
                         int mine_diff = center.comfirmed_mine_count - real_mine_count;
+                        //Console.WriteLine("{0} {1}", block_diff, mine_diff);
                         if (mine_diff == 0)
                         {
                             center.Simplified_blocks.ExceptWith(solve);
                             foreach (Position p in center.Simplified_blocks)
                             {
-                                if (openBlock(p.x, p.y))
+                                if (mines[p.x, p.y].mine_count == 0)
+                                {
+                                    openEmpty(p.x, p.y);
                                     return true;
+                                }
+
+                                else
+                                {
+                                    if (openBlock(p.x, p.y))
+                                        return true;
+                                }
+
                             }
                         }
 
                         if (mine_diff > 0 && mine_diff == block_diff)
                         {
                             center.Simplified_blocks.ExceptWith(solve);
+                            //CheckSet(center.Simplified_blocks);
                             foreach (Position p in center.Simplified_blocks)
                             {
+                                //Console.WriteLine("11111111111111111111111111111");
                                 mines[p.x, p.y].is_flag = true;
                                 rectangles[p.x, p.y].Fill = BlockBrush.flag;
                             }
                             return true;
                         }
                     }
+                    else if (!solve.SetEquals(center.Simplified_blocks))//not properset, not equal
+                    {
+                        int mine_diff = real_mine_count - center.comfirmed_mine_count;
+                        if (mine_diff > 0)
+                        {
+                            var new_set = new HashSet<Position>(solve);
+                            new_set.ExceptWith(center.Simplified_blocks);
+                            if (new_set.Count != 0)
+                            {
+                                int block_diff = new_set.Count;
+                                if (block_diff == mine_diff)
+                                {
+                                    foreach (Position p in new_set)
+                                    {
+                                        //Console.WriteLine("22222222222222222222222222222");
+                                        mines[p.x, p.y].is_flag = true;
+                                        rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                                    }
+                                    return true;
+                                }//bug here
 
+                            }
+                        }
+                        else if (mine_diff < 0)
+                        {
+                            //CheckSet(solve);
+                            //CheckSet(center.Simplified_blocks);
+                            var new_set = new HashSet<Position>(center.Simplified_blocks);
+                            new_set.ExceptWith(solve);
+                            int block_diff = new_set.Count;
+                            if (block_diff == -mine_diff)
+                            {
+                                foreach (Position p in new_set)
+                                {
+                                    //Console.WriteLine("3333333333333333333333333333333333 {0} {1}",x,y);
+                                    mines[p.x, p.y].is_flag = true;
+                                    rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                                }
+                                return true;
+                            }
+                        }
+
+                    }
+                    end:;
                 }
+                
             }
             return false;
         }
@@ -425,6 +491,7 @@ namespace MineSweeper
             {
                 Console.WriteLine("check: {0} {1}", p.x, p.y);
             }
+            Console.WriteLine();
         }
         #endregion
     }
