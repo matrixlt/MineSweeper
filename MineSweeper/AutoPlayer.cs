@@ -387,6 +387,7 @@ namespace MineSweeper
                                 }
 
                             }
+                            return true;
                         }
 
                         if (mine_diff > 0 && mine_diff == block_diff)
@@ -402,6 +403,50 @@ namespace MineSweeper
                             return true;
                         }
                     }
+
+                    else if (center.Simplified_blocks.IsProperSubsetOf(solve))//superset
+                    {
+                        int block_diff = solve.Count - center.Simplified_blocks.Count;
+                        int mine_diff = real_mine_count - center.comfirmed_mine_count;
+                        //Console.WriteLine("{0} {1}", block_diff, mine_diff);
+                        if (mine_diff == 0)
+                        {
+                            CheckSet(solve);
+                            CheckSet(center.Simplified_blocks);
+                            solve.ExceptWith(center.Simplified_blocks);
+                            foreach (Position p in solve)
+                            {
+                                Console.WriteLine("11111111111111111111111111111 {0} {1}",x,y);
+                                if (mines[p.x, p.y].mine_count == 0)
+                                {
+                                    openEmpty(p.x, p.y);
+                                    return true;
+                                }
+
+                                else
+                                {
+                                    if (openBlock(p.x, p.y))
+                                        return true;
+                                }
+
+                            }
+                            return true;
+                        }
+
+                        if (mine_diff > 0 && mine_diff == block_diff)
+                        {
+                            solve.ExceptWith(center.Simplified_blocks);
+                            //CheckSet(center.Simplified_blocks);
+                            foreach (Position p in solve)
+                            {
+                                //Console.WriteLine("11111111111111111111111111111");
+                                mines[p.x, p.y].is_flag = true;
+                                rectangles[p.x, p.y].Fill = BlockBrush.flag;
+                            }
+                            return true;
+                        }
+                    }
+
                     else if (!solve.SetEquals(center.Simplified_blocks))//not properset, not equal
                     {
                         int mine_diff = real_mine_count - center.comfirmed_mine_count;

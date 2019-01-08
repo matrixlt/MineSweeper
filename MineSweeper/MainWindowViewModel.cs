@@ -67,7 +67,7 @@ namespace MineSweeper
         {
             game = new Game();
             game.Random = random;
-            Distribution = game.Generate(16, 16, 40);
+            Distribution = game.Generate(16, 30, 99);
             Row = game.row;
             Col = game.col;
             Mine_number = game.mine_number;
