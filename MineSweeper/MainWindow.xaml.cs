@@ -206,6 +206,11 @@ namespace MineSweeper
 
         #endregion
 
+        private void CenterButtonRestart(object sender, RoutedEventArgs e)
+        {
+            VM.Restart();
+        }
+
         #region third menu 
         private void Save(object sender, RoutedEventArgs e)
         {

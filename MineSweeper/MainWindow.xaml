@@ -42,16 +42,21 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0">
-                Mines Left
-            </TextBlock>
-            <Button Grid.Column="1">
-                New
+            <TextBlock Grid.Column="0" Foreground="Red" Text="{Binding Path=Left_mine}" TextAlignment="Center" FontWeight="Bold" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Click="CenterButtonRestart">
+                <Image Source="image/smile.png" 
+                       RenderOptions.BitmapScalingMode="Fant"
+                       Stretch="Fill"
+                       Width="32"
+                       Height="32"
+                       VerticalAlignment="Top"
+                       Margin="0,0,0,0"
+                       HorizontalAlignment="Center"/>
             </Button>
-            <TextBlock Grid.Column="2"  Foreground="Red" Text="{Binding Path=Show_time, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" />
+            <TextBlock Grid.Column="2"  Foreground="Red" Text="{Binding Path=Show_time}" TextAlignment="Center" FontWeight="Bold" VerticalAlignment="Center"/>
         </Grid>
 
 
