@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace MineSweeper
 {
+    public enum GameType
+    {
+        Beginner,
+        Intermediate,
+        Expert,
+        Customized
+    }
+
     public class Game
     {
         private Random random;
@@ -16,6 +24,7 @@ namespace MineSweeper
         public int row;
         public int col;
         public int mine_number;
+        public GameType game_type = GameType.Customized;
 
         public int[,] distribution = null;
 

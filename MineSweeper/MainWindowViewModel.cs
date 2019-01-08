@@ -58,8 +58,9 @@ namespace MineSweeper
 
         Game game = null;
 
-        public delegate bool AutoPlay(int x, int y);
         public AutoPlayer player;
+
+        Record record = null;
         #endregion
 
         #region constructor
@@ -68,6 +69,7 @@ namespace MineSweeper
             game = new Game();
             game.Random = random;
             Distribution = game.Generate(16, 30, 99);
+            game.game_type = GameType.Expert;
             Row = game.row;
             Col = game.col;
             Mine_number = game.mine_number;
@@ -78,12 +80,15 @@ namespace MineSweeper
             Width = mine_size * Col;
             Main_height = Height + height_margin;
             Main_width = Width + width_margin;
+
             player = new AutoPlayer(row, col, Mines, Rectangles);
             player.inBorder = InBorder;
             player.lRClick = LRClick;
             player.openBlock = OpenBlock;
             player.openEmpty = OpenEmpty;
             player.flagBlock = FlagBlock;
+
+            record = new Record();
         }
         #endregion
 
@@ -136,8 +141,8 @@ namespace MineSweeper
             int x, y;                                     //position
             Mine mine = WhichMine(s, out x, out y);       //FIX LATER
 
-            Console.WriteLine(sender.ToString());
-            Console.WriteLine(mine.mine_count);
+            //Console.WriteLine(sender.ToString());
+            //Console.WriteLine(mine.mine_count);
 
             if (mine.is_flag)
                 return;
@@ -241,7 +246,10 @@ namespace MineSweeper
             }
 
             if (!Mines[x, y].is_mine)
-                Rectangles[x, y].Fill = BlockBrush.numbers[Mines[x, y].mine_count];
+            {
+                if (!test_mode)
+                    Rectangles[x, y].Fill = BlockBrush.numbers[Mines[x, y].mine_count];
+            }
             else
             {
                 Rectangles[x, y].Fill = BlockBrush.mine;
@@ -377,7 +385,8 @@ namespace MineSweeper
                 mine_number = value;
                 OnPropertyChanged("Mine_number");
             }
-        }                   //use for Customized Game
+        }
+
         public List<Border> BorderSet
         {
             get { return borders; }
@@ -387,6 +396,7 @@ namespace MineSweeper
                 OnPropertyChanged("BorderSet");
             }
         }
+
         public string Show_time
         {
             get => show_time;
@@ -436,6 +446,7 @@ namespace MineSweeper
                 OnPropertyChanged("Main_height");
             }
         }
+
         public int Main_width
         {
             get => main_width; set
@@ -450,6 +461,7 @@ namespace MineSweeper
         public bool Test_mode { get => test_mode; set => test_mode = value; }
 
         public int Count_flag { get => count_flag; set => count_flag = value; }
+        public GameType Type { get => game.game_type; set => game.game_type = value; }
         #endregion
 
         #region helpers in class
@@ -512,6 +524,11 @@ namespace MineSweeper
             Last_win = true;
             if (Test_mode)
                 return;
+
+            if (time_span < record.GetRecord(game.game_type))
+            {
+                record.SetRecord(game.game_type, time_span);
+            }
             string messageBoxText = "You just win !";
             string caption = "Minesweeper";
             MessageBoxButton button = MessageBoxButton.OK;
@@ -531,6 +548,9 @@ namespace MineSweeper
             MessageBox.Show(messageBoxText, caption, button, icon);
         }
 
+        #endregion
+
+        #region restart a game
         public void Restart()                           //much more things to do,such as frash AutoPlayer
         {
             In_game = false;
@@ -549,7 +569,10 @@ namespace MineSweeper
                 b.Background = new SolidColorBrush(Colors.Tan);
             }
 
+            GameType temp = game.game_type;             //fix later
             game = new Game();
+            game.game_type = temp;
+
             game.Random = random;
             Count_flag = 0;
             Left_mine = (Mine_number - Count_flag).ToString("D3");
@@ -569,12 +592,15 @@ namespace MineSweeper
 
         public void Restart(int x, int y)               //opt needed
         {
+            GameType temp = game.game_type;                 //fix later
+
             while (game.GetMineCount(x, y) == -1)
             {
                 game = new Game();
                 game.Random = random;
                 Distribution = game.Generate(row, col, mine_number);
             }
+            game.game_type = temp;
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
