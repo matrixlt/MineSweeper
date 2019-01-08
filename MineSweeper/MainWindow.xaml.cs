@@ -106,7 +106,7 @@ namespace MineSweeper
             VM.Test_mode = true;
             int win = 0;
             int lose = 0;
-            for(int i = 0; i < 1000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 if (!VM.In_game)
                     VM.player.RandomClick();
@@ -117,16 +117,17 @@ namespace MineSweeper
                     SimpleSolve();
                     if (VM.In_game)
                         VM.player.RandomClick();
-                    
+
                 }
-                if(VM.Last_win == true)
+                if (VM.Last_win == true)
                 {
                     win++;
-                }else if(VM.Last_win == false)
+                }
+                else if (VM.Last_win == false)
                 {
                     lose++;
                 }
-                Console.WriteLine("COUNT {0}",i);
+                Console.WriteLine("COUNT {0}", i);
             }
             VM.Test_mode = false;
             Console.WriteLine("WIN {0}   LOSE {1}", win, lose);
@@ -205,11 +206,6 @@ namespace MineSweeper
 
 
         #endregion
-
-        private void CenterButtonRestart(object sender, RoutedEventArgs e)
-        {
-            VM.Restart();
-        }
 
         #region third menu 
         private void Save(object sender, RoutedEventArgs e)

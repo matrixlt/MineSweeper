@@ -46,7 +46,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Foreground="Red" Text="{Binding Path=Left_mine}" TextAlignment="Center" FontWeight="Bold" VerticalAlignment="Center"/>
-            <Button Grid.Column="1" Click="CenterButtonRestart">
+            <Button Grid.Column="1" Click="Restart_Click">
                 <Image Source="image/smile.png" 
                        RenderOptions.BitmapScalingMode="Fant"
                        Stretch="Fill"

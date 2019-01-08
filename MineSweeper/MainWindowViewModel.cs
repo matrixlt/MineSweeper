@@ -39,7 +39,7 @@ namespace MineSweeper
         private double total_time;
         private string show_time = "000";
 
-        private Random random = new Random(DateTime.Now.Millisecond+97);
+        private Random random = new Random(DateTime.Now.Millisecond + 97);
         private int elapse_time;
         private DispatcherTimer dispatcherTimer = new DispatcherTimer();
 
@@ -68,10 +68,10 @@ namespace MineSweeper
             game = new Game();
             game.Random = random;
             Distribution = game.Generate(16, 16, 40);
-            this.row = game.row;
-            this.col = game.col;
-            this.mine_number = game.mine_number;
-            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
+            Row = game.row;
+            Col = game.col;
+            Mine_number = game.mine_number;
+            Left_mine = (Mine_number - Count_flag).ToString("D3");
 
             Ininitialize(game);
             Height = mine_size * Row;
@@ -204,8 +204,8 @@ namespace MineSweeper
             {
                 if (mine.is_flag)
                 {
-                    this.Count_flag -= 1;
-                    this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
+                    Count_flag -= 1;
+                    Left_mine = (Mine_number - Count_flag).ToString("D3");
                     mine.is_flag = false;
                     s.Fill = Brushes.AliceBlue;
                     //Console.WriteLine(this.Left_mine);
@@ -213,7 +213,7 @@ namespace MineSweeper
                 else
                 {
                     this.Count_flag += 1;
-                    this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
+                    Left_mine = (Mine_number - Count_flag).ToString("D3");
                     mine.is_flag = true;
                     s.Fill = BlockBrush.flag;
                     //Console.WriteLine(this.Left_mine);
@@ -369,7 +369,7 @@ namespace MineSweeper
                 mine_number = value;
                 OnPropertyChanged("Mine_number");
             }
-        }
+        }                   //use for Customized Game
         public List<Border> BorderSet
         {
             get { return borders; }
@@ -400,6 +400,7 @@ namespace MineSweeper
                 OnPropertyChanged("Height");
             }
         }
+
         public int Width
         {
             get => width; set
@@ -419,8 +420,11 @@ namespace MineSweeper
             }
         }
 
-        public int Main_height { get => main_height; set 
-                { main_height = value;
+        public int Main_height
+        {
+            get => main_height; set
+            {
+                main_height = value;
                 OnPropertyChanged("Main_height");
             }
         }
@@ -436,7 +440,7 @@ namespace MineSweeper
         public bool In_game { get => in_game; set => in_game = value; }
         public bool? Last_win { get => last_win; set => last_win = value; }
         public bool Test_mode { get => test_mode; set => test_mode = value; }
-            } }
+
         public int Count_flag { get => count_flag; set => count_flag = value; }
         #endregion
 
@@ -539,8 +543,9 @@ namespace MineSweeper
 
             game = new Game();
             game.Random = random;
-            this.Count_flag = 0;
-            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
+            Count_flag = 0;
+            Left_mine = (Mine_number - Count_flag).ToString("D3");
+
             Distribution = game.Generate(row, col, mine_number);
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
@@ -597,8 +602,9 @@ namespace MineSweeper
             game.Random = random;
             Row = game.row;
             Col = game.col;
-            this.Count_flag = 0;
-            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
+            Mine_number = game.mine_number;
+            Count_flag = 0;
+            Left_mine = (Mine_number - Count_flag).ToString("D3");
 
             Ininitialize(game);
             Height = mine_size * Row;
@@ -631,7 +637,9 @@ namespace MineSweeper
             Distribution = game.Generate(row, col, mine_count);
             Row = game.row;
             Col = game.col;
-            this.mine_number = game.mine_number;
+            Mine_number = game.mine_number;
+            Count_flag = 0;
+            Left_mine = (Mine_number - Count_flag).ToString("D3");
 
             Ininitialize(game);
             Height = mine_size * Row;
