@@ -32,6 +32,7 @@ namespace MineSweeper
         private int width;
         private int main_height;
         private int main_width;
+
         private bool first_interval = true;
         private DateTime start_time;
         private int time_span;
@@ -41,6 +42,9 @@ namespace MineSweeper
         private Random random = new Random(DateTime.Now.Millisecond+97);
         private int elapse_time;
         private DispatcherTimer dispatcherTimer = new DispatcherTimer();
+
+        private int count_flag = 0;
+        private string left_mine;
         #endregion
 
         #region other member
@@ -67,7 +71,8 @@ namespace MineSweeper
             this.row = game.row;
             this.col = game.col;
             this.mine_number = game.mine_number;
-            
+            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
+
             Ininitialize(game);
             Height = mine_size * Row;
             Width = mine_size * Col;
@@ -182,6 +187,7 @@ namespace MineSweeper
             {
                 dispatcherTimer.Stop();
                 total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
+                Left_mine = "000";
                 WinWindow();
                 Restart();
             }
@@ -198,13 +204,19 @@ namespace MineSweeper
             {
                 if (mine.is_flag)
                 {
+                    this.Count_flag -= 1;
+                    this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
                     mine.is_flag = false;
                     s.Fill = Brushes.AliceBlue;
+                    //Console.WriteLine(this.Left_mine);
                 }
                 else
                 {
+                    this.Count_flag += 1;
+                    this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
                     mine.is_flag = true;
                     s.Fill = BlockBrush.flag;
+                    //Console.WriteLine(this.Left_mine);
                 }
             }
         }
@@ -241,6 +253,7 @@ namespace MineSweeper
             Mines[x, y].is_cover = false;
             if (game.IsFinish(Mines))
             {
+                this.Left_mine = "000";
                 WinWindow();
                 Restart();
                 return true;
@@ -317,7 +330,6 @@ namespace MineSweeper
                         this.Show_time = Convert.ToInt64(time_span).ToString("D3");
                     }
                 }
-                //Console.WriteLine(show_time);
             }
         }
 
@@ -397,11 +409,18 @@ namespace MineSweeper
             }
         }
 
-        public int Main_height
+        public string Left_mine
         {
-            get => main_height; set
+            get => left_mine;
+            set
             {
-                main_height = value;
+                left_mine = value;
+                OnPropertyChanged("Left_mine");
+            }
+        }
+
+        public int Main_height { get => main_height; set 
+                { main_height = value;
                 OnPropertyChanged("Main_height");
             }
         }
@@ -417,6 +436,8 @@ namespace MineSweeper
         public bool In_game { get => in_game; set => in_game = value; }
         public bool? Last_win { get => last_win; set => last_win = value; }
         public bool Test_mode { get => test_mode; set => test_mode = value; }
+            } }
+        public int Count_flag { get => count_flag; set => count_flag = value; }
         #endregion
 
         #region helpers in class
@@ -518,6 +539,8 @@ namespace MineSweeper
 
             game = new Game();
             game.Random = random;
+            this.Count_flag = 0;
+            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
             Distribution = game.Generate(row, col, mine_number);
             player.SetProperties(row, col, Mines, Rectangles);
             for (int i = 0; i < row; i++)
@@ -555,6 +578,7 @@ namespace MineSweeper
 
             if (game.IsFinish(Mines))
             {
+                Left_mine = "000";
                 WinWindow();
                 Restart();
             }
@@ -573,7 +597,8 @@ namespace MineSweeper
             game.Random = random;
             Row = game.row;
             Col = game.col;
-            this.mine_number = game.mine_number;
+            this.Count_flag = 0;
+            this.Left_mine = (this.mine_number - this.Count_flag).ToString("D3");
 
             Ininitialize(game);
             Height = mine_size * Row;
