@@ -36,6 +36,10 @@
                 <MenuItem Header="AutoTest" Click="AutoTest"/>
                 <MenuItem Header="AutoTest100" Click="AutoTest100"/>
             </MenuItem>
+            <MenuItem Header="Hint">
+                <MenuItem Header="HintSimpleFlag" Click="HintSimpleFlag"/>
+                <MenuItem Header="HintSimpleClick" Click="HintSimpleClick"/>
+            </MenuItem>
             <MenuItem Header="File">
                 <MenuItem Header="Save" Click="Save"/>
                 <MenuItem Header="Load" Click="Load"/>

@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 
 namespace MineSweeper
@@ -15,8 +19,11 @@ namespace MineSweeper
         Mine[,] mines = null;
         Rectangle[,] rectangles = null;
         Random random = new Random(DateTime.Now.Millisecond);
+        public List<Border> borders;
+        public MainWindow MW;
 
         public delegate bool AutoPlay(int x, int y);
+        public delegate bool Hint(int x, int y, bool mode = false);
         public delegate bool InBorder(int x, int y);
         public delegate void LRClick(int x, int y);
         public delegate bool OpenBlock(int x, int y);
@@ -101,6 +108,17 @@ namespace MineSweeper
             return result;
         }
 
+        private void ShowAnimation(int x, int y)
+        {
+            DoubleAnimation myDoubleAnimation = new DoubleAnimation();
+            myDoubleAnimation.From = 1.0;
+            myDoubleAnimation.To = 0.0;
+            myDoubleAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.5));
+            myDoubleAnimation.AutoReverse = true;
+
+            rectangles[x, y].BeginAnimation(Rectangle.OpacityProperty, myDoubleAnimation);
+        }
+
         #region AutoPlay
         public bool SimpleTest(AutoPlay f)
         {
@@ -119,8 +137,25 @@ namespace MineSweeper
             }
             return effective;
         }
+        public bool SimpleTest(Hint f)//for old codes
+        {
+            bool effective = false;
+            for (int i = 0; i < row; i++)
+            {
+                for (int j = 0; j < col; j++)
+                {
+                    if (!mines[i, j].is_cover)
+                    {
+                        bool test = f(i, j);
+                        effective = test || effective;
+                    }
 
-        public bool SimpleFlag(int x, int y)
+                }
+            }
+            return effective;
+        }
+
+        public bool SimpleFlag(int x, int y, bool hint_mode = false)
         {
             BlockInfo info = GetInfo(x, y);
             int flag_count = info.flag_count;
@@ -135,7 +170,15 @@ namespace MineSweeper
                     {
                         if (inBorder(i, j) && mines[i, j].is_cover)
                         {
-                            flagBlock(i, j);
+                            if (!mines[i, j].is_flag)
+                            {
+                                if (hint_mode)//animation
+                                {
+                                    ShowAnimation(i, j);
+                                    return true;
+                                }
+                                flagBlock(i, j);
+                            }
                         }
                     }
                 }
@@ -145,7 +188,7 @@ namespace MineSweeper
             return false;
         }
 
-        public bool SimpleClick(int x, int y)
+        public bool SimpleClick(int x, int y,bool hint_mode = false)
         {
             BlockInfo info = GetInfo(x, y);
             int flag_count = info.flag_count;
@@ -153,6 +196,15 @@ namespace MineSweeper
 
             if (flag_count == mines[x, y].mine_count)
             {
+                if (hint_mode && unflag_count != 0)
+                {
+                    var block_set = GetBlockSet(x, y, true);
+                    foreach(Position p in block_set)
+                    {
+                        ShowAnimation(p.x, p.y);
+                    }
+                    return true;
+                }
                 lRClick(x, y);
                 if (unflag_count != 0)
                     return true;
@@ -551,6 +603,19 @@ namespace MineSweeper
             }
 
         }
+
+        public void SimpleHint(Hint f)
+        {
+            for (int x = 0; x < row; x++)
+            {
+                for (int y = 0; y < col; y++)
+                {
+                    if (!mines[x,y].is_cover && mines[x,y].mine_count != 0 && f(x, y, true))
+                        return;
+                }
+            }
+        }
+
         #endregion
 
         #region debug

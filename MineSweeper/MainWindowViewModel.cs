@@ -62,6 +62,7 @@ namespace MineSweeper
         public AutoPlayer player;
 
         public Record record = null;
+
         #endregion
 
         #region constructor
@@ -88,7 +89,7 @@ namespace MineSweeper
             player.openBlock = OpenBlock;
             player.openEmpty = OpenEmpty;
             player.flagBlock = FlagBlock;
-
+            player.borders = BorderSet;
             record = new Record();
         }
         #endregion

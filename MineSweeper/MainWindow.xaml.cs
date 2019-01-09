@@ -28,6 +28,7 @@ namespace MineSweeper
             SL = new SaveAndLoad();
             InitializeComponent();
             DataContext = VM;
+            
 
         }
         private void ShowRecord(object sender, RoutedEventArgs e)
@@ -300,6 +301,18 @@ namespace MineSweeper
             VM.Restart(distribution);
 
 
+        }
+        #endregion
+
+        #region hint
+        private void HintSimpleFlag(object sender, RoutedEventArgs e)
+        {
+            VM.player.SimpleHint(VM.player.SimpleFlag);
+        }
+
+        private void HintSimpleClick(object sender, RoutedEventArgs e)
+        {
+            VM.player.SimpleHint(VM.player.SimpleClick);
         }
         #endregion
     }
