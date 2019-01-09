@@ -529,6 +529,8 @@ namespace MineSweeper
             {
                 record.SetRecord(game.game_type, time_span);
             }
+            SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path + Game.id.ToString() + ".txt");
+
             string messageBoxText = "You just win !";
             string caption = "Minesweeper";
             MessageBoxButton button = MessageBoxButton.OK;
@@ -541,6 +543,7 @@ namespace MineSweeper
             Last_win = false;
             if (Test_mode)
                 return;
+            SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path + Game.id.ToString() + ".txt");
             string messageBoxText = "You just hit a mine!";
             string caption = "Minesweeper";
             MessageBoxButton button = MessageBoxButton.OK;

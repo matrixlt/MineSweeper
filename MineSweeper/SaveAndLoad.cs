@@ -9,6 +9,7 @@ namespace MineSweeper
 {
     class SaveAndLoad
     {
+        public static String path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\Minesweeper\\";
         public static void Save(int row, int col, int[,] is_mine, string path)
         {
             if (!File.Exists(path))
