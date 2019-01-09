@@ -27,7 +27,7 @@ namespace MineSweeper
         private bool both_down = false;
 
         private int mine_size = 25;
-        private int height_margin = 150;
+        private int height_margin = 100;
         private int width_margin = 75;
         private int height;
         private int width;
@@ -90,6 +90,7 @@ namespace MineSweeper
             player.openEmpty = OpenEmpty;
             player.flagBlock = FlagBlock;
             player.borders = BorderSet;
+            player.clickBlock = ClickBlock;
             record = new Record();
         }
         #endregion
@@ -178,16 +179,7 @@ namespace MineSweeper
                 }
                 else
                 {
-
-                    if (mine.mine_count == 0)
-                    {
-                        OpenEmpty(x, y);
-                    }
-                    else
-                    {
-                        OpenBlock(x, y);
-                    }
-
+                    ClickBlock(x, y, mine);
                 }
             }
 
@@ -302,12 +294,7 @@ namespace MineSweeper
                 {
                     if (InBorder(i, j) && !Mines[i, j].is_flag)
                     {
-                        if (Mines[i, j].mine_count == 0)
-                            OpenEmpty(i, j);
-                        else
-                        {
-                            if (OpenBlock(i, j)) return;
-                        }
+                        ClickBlock(i, j, Mines[i, j]);
                     }
 
                 }
@@ -320,6 +307,16 @@ namespace MineSweeper
             if (test_mode)
                 return;
             Rectangles[x, y].Fill = BlockBrush.flag;
+        }
+
+        public void ClickBlock(int x, int y, Mine mine)//need to modify
+        {
+            if (mine.mine_count == 0)
+                OpenEmpty(x, y);
+            else
+            {
+                if (OpenBlock(x, y)) return;
+            }
         }
         #endregion
 
