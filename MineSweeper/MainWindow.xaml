@@ -17,6 +17,8 @@
                 <MenuItem Header="Beginner" Name="beginner" Click="ChooseGame"/>
                 <MenuItem Header="Intermediate" Name="intermediate" Click="ChooseGame"/>
                 <MenuItem Header="Expert" Name="expert" Click="ChooseGame"/>
+                <Separator />
+                <MenuItem Header="Local Record" Click="ShowRecord"/>
             </MenuItem>
             <MenuItem Header="AutoPlay">
                 <MenuItem Header="SimpleFlag" Click="SimpleFlag"/>

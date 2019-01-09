@@ -20,6 +20,7 @@ namespace MineSweeper
         private bool first_click = true;
         private bool? last_win = null;
         private bool test_mode = false;
+        private bool cheat_mode = false;
         private int row;
         private int col;
         private int mine_number;
@@ -60,7 +61,7 @@ namespace MineSweeper
 
         public AutoPlayer player;
 
-        Record record = null;
+        public Record record = null;
         #endregion
 
         #region constructor
@@ -171,7 +172,7 @@ namespace MineSweeper
                     borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
                     dispatcherTimer.Stop();
                     total_time = 0;
-                    LoseWindow();
+                    LoseGame();
                     Restart();
                 }
                 else
@@ -194,7 +195,7 @@ namespace MineSweeper
                 dispatcherTimer.Stop();
                 total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
                 Left_mine = "000";
-                WinWindow();
+                WinGame();
                 Restart();
             }
 
@@ -254,7 +255,7 @@ namespace MineSweeper
             {
                 Rectangles[x, y].Fill = BlockBrush.mine;
                 borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
-                LoseWindow();
+                LoseGame();
                 Restart();
                 return true;
             }
@@ -262,7 +263,7 @@ namespace MineSweeper
             if (game.IsFinish(Mines))
             {
                 this.Left_mine = "000";
-                WinWindow();
+                WinGame();
                 Restart();
                 return true;
             }
@@ -462,6 +463,7 @@ namespace MineSweeper
 
         public int Count_flag { get => count_flag; set => count_flag = value; }
         public GameType Type { get => game.game_type; set => game.game_type = value; }
+        public bool Cheat_mode { get => cheat_mode; set => cheat_mode = value; }
         #endregion
 
         #region helpers in class
@@ -519,13 +521,13 @@ namespace MineSweeper
             return (x >= 0 && x < row && y >= 0 && y < col);
         }
 
-        public void WinWindow()//attention ! not just a window
+        public void WinGame()
         {
             Last_win = true;
             if (Test_mode)
                 return;
 
-            if (time_span < record.GetRecord(game.game_type))
+            if (!Cheat_mode && time_span < record.GetRecord(game.game_type))
             {
                 record.SetRecord(game.game_type, time_span);
             }
@@ -536,7 +538,7 @@ namespace MineSweeper
             MessageBox.Show(messageBoxText, caption, button, icon);
         }
 
-        public void LoseWindow()
+        public void LoseGame()
         {
             Last_win = false;
             if (Test_mode)
@@ -568,10 +570,11 @@ namespace MineSweeper
             {
                 b.Background = new SolidColorBrush(Colors.Tan);
             }
-
+            Cheat_mode = false;
             GameType temp = game.game_type;             //fix later
             game = new Game();
             game.game_type = temp;
+
 
             game.Random = random;
             Count_flag = 0;
@@ -618,7 +621,7 @@ namespace MineSweeper
             if (game.IsFinish(Mines))
             {
                 Left_mine = "000";
-                WinWindow();
+                WinGame();
                 Restart();
             }
         }

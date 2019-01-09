@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MineSweeper
 {
-    class Record
+    public class Record
     {
         private int beginner_best = 999;
         private int intermediate_best = 999;
@@ -21,7 +21,7 @@ namespace MineSweeper
             this.path = path;
             if (!File.Exists(path))
             {
-                Reset(path);
+                Reset();
             }
             else
             {
@@ -76,7 +76,7 @@ namespace MineSweeper
             }
         }
 
-        public void Reset(string path)
+        public void Reset()
         {
             using (StreamWriter sw = File.CreateText(path))
             {

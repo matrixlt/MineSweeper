@@ -30,7 +30,14 @@ namespace MineSweeper
             DataContext = VM;
 
         }
-
+        private void ShowRecord(object sender, RoutedEventArgs e)
+        {
+            RecordWindow recordWindow = new RecordWindow(VM.record);
+            if (recordWindow.ShowDialog() == true)
+            {
+                recordWindow.Close();
+            }
+        }
         #region AutoPlay
         private void Restart_Click(object sender, RoutedEventArgs e)//maybe should be in other place
         {
@@ -39,41 +46,49 @@ namespace MineSweeper
 
         private void SimpleFlag(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.player.SimpleTest(VM.player.SimpleFlag);
         }
 
         private void SimpleClick(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.player.SimpleTest(VM.player.SimpleClick);
         }
 
         private void ComplexFlag(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.player.SimpleTest(VM.player.ComplexFlag);
         }
 
         private void UncertainComplexFlag(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.player.SimpleTest(VM.player.UncertainComplexFlag);
         }
 
         private void ComplexClick(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.player.SimpleTest(VM.player.ComplexClick);
         }
 
         private void CompleteAnalyze(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.player.SimpleTest(VM.player.CompleteAnalyze);
         }
 
         private void SealedBlock(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.player.SealedBlock();
         }
 
         private void RandomClick(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.player.RandomClick();
         }
 
@@ -83,17 +98,20 @@ namespace MineSweeper
             {
                 VM.Restart(8, 8, 10);
                 VM.Type = GameType.Beginner;
+                VM.Cheat_mode = false;
             }
             if (sender == intermediate)
             {
                 VM.Restart(16, 16, 40);
                 VM.Type = GameType.Intermediate;
+                VM.Cheat_mode = false;
             }
 
             if (sender == expert)
             {
                 VM.Restart(16, 30, 99);
                 VM.Type = GameType.Expert;
+                VM.Cheat_mode = false;
             }
 
         }
@@ -102,16 +120,19 @@ namespace MineSweeper
         #region AutoTest
         private void SimpleTest(object sender, RoutedEventArgs e)//rare bug??
         {
+            VM.Cheat_mode = true;
             SimpleSolve();
         }
 
         private void ComplexTest(object sender, RoutedEventArgs e)//bug not fixed
         {
+            VM.Cheat_mode = true;
             ComplexSolve();
         }
 
         private void AutoTest(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             if (!VM.In_game)
                 VM.player.RandomClick();
             while (VM.In_game)
@@ -124,6 +145,7 @@ namespace MineSweeper
 
         private void AutoTest100(object sender, RoutedEventArgs e)
         {
+            VM.Cheat_mode = true;
             VM.Test_mode = true;
             int win = 0;
             int lose = 0;
