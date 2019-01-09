@@ -39,6 +39,10 @@
             <MenuItem Header="Hint">
                 <MenuItem Header="HintSimpleFlag" Click="HintSimpleFlag"/>
                 <MenuItem Header="HintSimpleClick" Click="HintSimpleClick"/>
+                <MenuItem Header="HintComplexClick" Click="HintComplexClick"/>
+                <MenuItem Header="HintComplexFlag" Click="HintComplexFlag"/>
+                <MenuItem Header="HintUncertainComplexFlag" Click="HintUncertainComplexFlag"/>
+                <MenuItem Header="HintCompleteAnalyze" Click="HintCompleteAnalyze"/>
             </MenuItem>
             <MenuItem Header="File">
                 <MenuItem Header="Save" Click="Save"/>

@@ -28,7 +28,7 @@ namespace MineSweeper
             SL = new SaveAndLoad();
             InitializeComponent();
             DataContext = VM;
-            
+
 
         }
         private void ShowRecord(object sender, RoutedEventArgs e)
@@ -232,7 +232,7 @@ namespace MineSweeper
         }
         #endregion
 
-        #region LZS adding settingWindow
+        #region settingWindow
         private void SettingClick(object sender, RoutedEventArgs e)
         {
             SettingWindow settingWindow = new SettingWindow(VM.Row, VM.Col, VM.Mine_number);
@@ -251,7 +251,7 @@ namespace MineSweeper
 
         #endregion
 
-        #region third menu 
+        #region file
         private void Save(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -313,6 +313,26 @@ namespace MineSweeper
         private void HintSimpleClick(object sender, RoutedEventArgs e)
         {
             VM.player.SimpleHint(VM.player.SimpleClick);
+        }
+
+        private void HintComplexClick(object sender, RoutedEventArgs e)
+        {
+            VM.player.SimpleHint(VM.player.ComplexClick);
+        }
+
+        private void HintComplexFlag(object sender, RoutedEventArgs e)//test neeeded
+        {
+            VM.player.SimpleHint(VM.player.ComplexFlag);
+        }
+
+        private void HintUncertainComplexFlag(object sender, RoutedEventArgs e)
+        {
+            VM.player.SimpleHint(VM.player.UncertainComplexFlag);
+        }
+
+        private void HintCompleteAnalyze(object sender, RoutedEventArgs e)
+        {
+            VM.player.SimpleHint(VM.player.CompleteAnalyze);
         }
         #endregion
     }

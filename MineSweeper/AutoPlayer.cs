@@ -175,9 +175,8 @@ namespace MineSweeper
                                 if (hint_mode)//animation
                                 {
                                     ShowAnimation(i, j);
-                                    return true;
                                 }
-                                flagBlock(i, j);
+                                else flagBlock(i, j);
                             }
                         }
                     }
@@ -188,7 +187,7 @@ namespace MineSweeper
             return false;
         }
 
-        public bool SimpleClick(int x, int y,bool hint_mode = false)
+        public bool SimpleClick(int x, int y, bool hint_mode = false)
         {
             BlockInfo info = GetInfo(x, y);
             int flag_count = info.flag_count;
@@ -199,7 +198,7 @@ namespace MineSweeper
                 if (hint_mode && unflag_count != 0)
                 {
                     var block_set = GetBlockSet(x, y, true);
-                    foreach(Position p in block_set)
+                    foreach (Position p in block_set)
                     {
                         ShowAnimation(p.x, p.y);
                     }
@@ -212,7 +211,7 @@ namespace MineSweeper
             return false;
         }
 
-        public bool UncertainComplexFlag(int x, int y)//analyze in 3*3, opt needed
+        public bool UncertainComplexFlag(int x, int y, bool hint_mode = false)//analyze in 3*3, opt needed
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -260,7 +259,9 @@ namespace MineSweeper
                     {
                         if (!mines[p.x, p.y].is_flag)
                         {
-                            flagBlock(p.x, p.y);
+                            if (hint_mode)
+                                ShowAnimation(p.x, p.y);
+                            else flagBlock(p.x, p.y);
                             test = true;
                         }
                     }
@@ -271,7 +272,7 @@ namespace MineSweeper
 
         }
 
-        public bool ComplexFlag(int x, int y)//analyze in 3*3
+        public bool ComplexFlag(int x, int y, bool hint_mode = false)//analyze in 3*3
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -305,8 +306,11 @@ namespace MineSweeper
                     {
                         foreach (Position p in center.Simplified_blocks)
                         {
-                            flagBlock(p.x, p.y);
+                            if (hint_mode)
+                                ShowAnimation(p.x, p.y);
+                            else flagBlock(p.x, p.y);
                         }
+                        return true;
                     }
                     else
                     {
@@ -320,7 +324,7 @@ namespace MineSweeper
             return false;
         }
 
-        public bool ComplexClick(int x, int y)//analyze in 3*3+,simplified and comfirmed
+        public bool ComplexClick(int x, int y, bool hint_mode = false)//analyze in 3*3+,simplified and comfirmed
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -350,15 +354,23 @@ namespace MineSweeper
                     center.Simplified_blocks.ExceptWith(units[i].Simplified_blocks);
                     foreach (Position p in center.Simplified_blocks)
                     {
-                        if (mines[p.x, p.y].mine_count != 0)
+                        if (hint_mode)
                         {
-                            if (openBlock(p.x, p.y))
-                                return true;//win or lose
+                            ShowAnimation(p.x, p.y);
                         }
                         else
                         {
-                            openEmpty(p.x, p.y);
+                            if (mines[p.x, p.y].mine_count != 0)
+                            {
+                                if (openBlock(p.x, p.y))
+                                    return true;//win or lose
+                            }
+                            else
+                            {
+                                openEmpty(p.x, p.y);
+                            }
                         }
+
 
                     }
                     return true;
@@ -369,7 +381,7 @@ namespace MineSweeper
             return false;
         }
 
-        public bool CompleteAnalyze(int x, int y)//analyze in 5*5+,simplified and comfirmed,test needed
+        public bool CompleteAnalyze(int x, int y, bool hint_mode = false)//analyze in 5*5+,simplified and comfirmed,test needed
         {
             List<SolveUnit> units = new List<SolveUnit> { };
             SolveUnit center = new SolveUnit(mines[x, y].mine_count);
@@ -425,18 +437,24 @@ namespace MineSweeper
                             center.Simplified_blocks.ExceptWith(solve);
                             foreach (Position p in center.Simplified_blocks)
                             {
-                                if (mines[p.x, p.y].mine_count == 0)
+                                if (hint_mode)
                                 {
-                                    openEmpty(p.x, p.y);
-                                    return true;
+                                    ShowAnimation(p.x, p.y);
                                 }
-
                                 else
                                 {
-                                    if (openBlock(p.x, p.y))
+                                    if (mines[p.x, p.y].mine_count == 0)
+                                    {
+                                        openEmpty(p.x, p.y);
                                         return true;
-                                }
+                                    }
 
+                                    else
+                                    {
+                                        if (openBlock(p.x, p.y))
+                                            return true;
+                                    }
+                                }
                             }
                             return true;
                         }
@@ -447,8 +465,9 @@ namespace MineSweeper
                             //CheckSet(center.Simplified_blocks);
                             foreach (Position p in center.Simplified_blocks)
                             {
-                                //Console.WriteLine("11111111111111111111111111111");
-                                flagBlock(p.x, p.y);
+                                if (hint_mode)
+                                    ShowAnimation(p.x, p.y);
+                                else flagBlock(p.x, p.y);
                             }
                             return true;
                         }
@@ -466,17 +485,23 @@ namespace MineSweeper
                             solve.ExceptWith(center.Simplified_blocks);
                             foreach (Position p in solve)
                             {
-                                Console.WriteLine("11111111111111111111111111111 {0} {1}", x, y);
-                                if (mines[p.x, p.y].mine_count == 0)
+                                if (hint_mode)
                                 {
-                                    openEmpty(p.x, p.y);
-                                    return true;
+                                    ShowAnimation(p.x, p.y);
                                 }
-
                                 else
                                 {
-                                    if (openBlock(p.x, p.y))
+                                    if (mines[p.x, p.y].mine_count == 0)
+                                    {
+                                        openEmpty(p.x, p.y);
                                         return true;
+                                    }
+
+                                    else
+                                    {
+                                        if (openBlock(p.x, p.y))
+                                            return true;
+                                    }
                                 }
 
                             }
@@ -489,8 +514,9 @@ namespace MineSweeper
                             //CheckSet(center.Simplified_blocks);
                             foreach (Position p in solve)
                             {
-                                //Console.WriteLine("11111111111111111111111111111");
-                                flagBlock(p.x, p.y);
+                                if (hint_mode)
+                                    ShowAnimation(p.x, p.y);
+                                else flagBlock(p.x, p.y);
                             }
                             return true;
                         }
@@ -510,11 +536,12 @@ namespace MineSweeper
                                 {
                                     foreach (Position p in new_set)
                                     {
-                                        //Console.WriteLine("22222222222222222222222222222");
-                                        flagBlock(p.x, p.y);
+                                        if (hint_mode)
+                                            ShowAnimation(p.x, p.y);
+                                        else flagBlock(p.x, p.y);
                                     }
                                     return true;
-                                }//bug here
+                                }
 
                             }
                         }
@@ -529,8 +556,9 @@ namespace MineSweeper
                             {
                                 foreach (Position p in new_set)
                                 {
-                                    //Console.WriteLine("3333333333333333333333333333333333 {0} {1}",x,y);
-                                    flagBlock(p.x, p.y);
+                                    if (hint_mode)
+                                        ShowAnimation(p.x, p.y);
+                                    else flagBlock(p.x, p.y);
                                 }
                                 return true;
                             }
@@ -610,7 +638,7 @@ namespace MineSweeper
             {
                 for (int y = 0; y < col; y++)
                 {
-                    if (!mines[x,y].is_cover && mines[x,y].mine_count != 0 && f(x, y, true))
+                    if (!mines[x, y].is_cover && mines[x, y].mine_count != 0 && f(x, y, true))
                         return;
                 }
             }
