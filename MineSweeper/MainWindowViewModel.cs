@@ -339,11 +339,7 @@ namespace MineSweeper
                 if (elapse_time >= 1)
                 {
                     time_span = elapse_time + time_span;
-                    if (time_span > 999)
-                    {
-                        this.Show_time = Convert.ToInt64(time_span - 1000).ToString("D3");
-                    }
-                    else
+                    if (time_span <= 999)
                     {
                         this.Show_time = Convert.ToInt64(time_span).ToString("D3");
                     }
@@ -524,6 +520,8 @@ namespace MineSweeper
 
         public void WinGame()
         {
+            dispatcherTimer.Stop();
+
             Last_win = true;
             if (Test_mode)
                 return;
