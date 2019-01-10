@@ -29,8 +29,53 @@ namespace MineSweeper
             InitializeComponent();
             DataContext = VM;
 
+        }
+
+        #region Game
+        private void Restart_Click(object sender, RoutedEventArgs e)//maybe should be in other place
+        {
+            VM.Restart();
+        }
+
+        private void ChooseGame(object sender, RoutedEventArgs e)
+        {
+            if (sender == beginner)
+            {
+                VM.Restart(8, 8, 10);
+                VM.Type = GameType.Beginner;
+                VM.Cheat_mode = false;
+            }
+            if (sender == intermediate)
+            {
+                VM.Restart(16, 16, 40);
+                VM.Type = GameType.Intermediate;
+                VM.Cheat_mode = false;
+            }
+
+            if (sender == expert)
+            {
+                VM.Restart(16, 30, 99);
+                VM.Type = GameType.Expert;
+                VM.Cheat_mode = false;
+            }
 
         }
+
+        private void SettingClick(object sender, RoutedEventArgs e)
+        {
+            SettingWindow settingWindow = new SettingWindow(VM.Row, VM.Col, VM.Mine_number);
+            if (settingWindow.ShowDialog() == true)
+            {
+                VM.Col = int.Parse(settingWindow.colsSetting.Text);
+                VM.Row = int.Parse(settingWindow.rowsSetting.Text);
+                VM.Mine_number = int.Parse(settingWindow.minesSetting.Text);
+                VM.Height = 25 * VM.Row;
+                VM.Width = 25 * VM.Col;
+                settingWindow.Close();
+                VM.Restart(VM.Row, VM.Col, VM.Mine_number); //need to change the Distribution[,]
+            }
+        }
+
         private void ShowRecord(object sender, RoutedEventArgs e)
         {
             RecordWindow recordWindow = new RecordWindow(VM.record);
@@ -39,11 +84,10 @@ namespace MineSweeper
                 recordWindow.Close();
             }
         }
+
+        #endregion
+
         #region AutoPlay
-        private void Restart_Click(object sender, RoutedEventArgs e)//maybe should be in other place
-        {
-            VM.Restart();
-        }
 
         private void SimpleFlag(object sender, RoutedEventArgs e)
         {
@@ -93,29 +137,6 @@ namespace MineSweeper
             VM.player.RandomClick();
         }
 
-        private void ChooseGame(object sender, RoutedEventArgs e)
-        {
-            if (sender == beginner)
-            {
-                VM.Restart(8, 8, 10);
-                VM.Type = GameType.Beginner;
-                VM.Cheat_mode = false;
-            }
-            if (sender == intermediate)
-            {
-                VM.Restart(16, 16, 40);
-                VM.Type = GameType.Intermediate;
-                VM.Cheat_mode = false;
-            }
-
-            if (sender == expert)
-            {
-                VM.Restart(16, 30, 99);
-                VM.Type = GameType.Expert;
-                VM.Cheat_mode = false;
-            }
-
-        }
         #endregion
 
         #region AutoTest
@@ -232,26 +253,7 @@ namespace MineSweeper
         }
         #endregion
 
-        #region settingWindow
-        private void SettingClick(object sender, RoutedEventArgs e)
-        {
-            SettingWindow settingWindow = new SettingWindow(VM.Row, VM.Col, VM.Mine_number);
-            if (settingWindow.ShowDialog() == true)
-            {
-                VM.Col = int.Parse(settingWindow.colsSetting.Text);
-                VM.Row = int.Parse(settingWindow.rowsSetting.Text);
-                VM.Mine_number = int.Parse(settingWindow.minesSetting.Text);
-                VM.Height = 25 * VM.Row;
-                VM.Width = 25 * VM.Col;
-                settingWindow.Close();
-                VM.Restart(VM.Row, VM.Col, VM.Mine_number); //need to change the Distribution[,]
-            }
-        }
-
-
-        #endregion
-
-        #region file
+        #region File
         private void Save(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -304,7 +306,7 @@ namespace MineSweeper
         }
         #endregion
 
-        #region hint
+        #region Hint
         private void HintSimpleFlag(object sender, RoutedEventArgs e)
         {
             VM.player.SimpleHint(VM.player.SimpleFlag);

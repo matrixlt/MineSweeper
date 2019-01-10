@@ -27,7 +27,7 @@ namespace MineSweeper
         private bool both_down = false;
 
         private int mine_size = 25;
-        private int height_margin = 150;
+        private int height_margin = 100;
         private int width_margin = 75;
         private int height;
         private int width;
@@ -90,6 +90,7 @@ namespace MineSweeper
             player.openEmpty = OpenEmpty;
             player.flagBlock = FlagBlock;
             player.borders = BorderSet;
+            //player.clickBlock = ClickBlock;
             record = new Record();
         }
         #endregion
@@ -178,16 +179,8 @@ namespace MineSweeper
                 }
                 else
                 {
-
-                    if (mine.mine_count == 0)
-                    {
-                        OpenEmpty(x, y);
-                    }
-                    else
-                    {
-                        OpenBlock(x, y);
-                    }
-
+                    if (ClickBlock(x, y, mine))
+                        return;
                 }
             }
 
@@ -302,12 +295,8 @@ namespace MineSweeper
                 {
                     if (InBorder(i, j) && !Mines[i, j].is_flag)
                     {
-                        if (Mines[i, j].mine_count == 0)
-                            OpenEmpty(i, j);
-                        else
-                        {
-                            if (OpenBlock(i, j)) return;
-                        }
+                        if (ClickBlock(i, j, Mines[i, j]))
+                            return;
                     }
 
                 }
@@ -320,6 +309,19 @@ namespace MineSweeper
             if (test_mode)
                 return;
             Rectangles[x, y].Fill = BlockBrush.flag;
+        }
+
+        public bool ClickBlock(int x, int y, Mine mine)//need to modify, need to test
+        {
+            if (mine.mine_count == 0)
+                OpenEmpty(x, y);
+            else
+            {
+                if (OpenBlock(x, y))
+                    return true;
+            }
+
+            return false;
         }
         #endregion
 
@@ -525,16 +527,29 @@ namespace MineSweeper
             Last_win = true;
             if (Test_mode)
                 return;
-
+            string messageBoxText = "You just win !";
             if (!Cheat_mode && time_span < record.GetRecord(game.game_type))
             {
                 record.SetRecord(game.game_type, time_span);
+                messageBoxText += "And you just break a record!";
             }
-            string messageBoxText = "You just win !";
+
+
+            messageBoxText += "\n Do you want to save this game?";
             string caption = "Minesweeper";
-            MessageBoxButton button = MessageBoxButton.OK;
+            MessageBoxButton button = MessageBoxButton.YesNo;
             MessageBoxImage icon = MessageBoxImage.Information;
-            MessageBox.Show(messageBoxText, caption, button, icon);
+            var result = MessageBox.Show(messageBoxText, caption, button, icon);
+
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
+                        "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
+                    break;
+                case MessageBoxResult.No:
+                    break;
+            }
         }
 
         public void LoseGame()
@@ -542,11 +557,23 @@ namespace MineSweeper
             Last_win = false;
             if (Test_mode)
                 return;
+            SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path + Game.id.ToString() + ".txt");
             string messageBoxText = "You just hit a mine!";
+            messageBoxText += "\n Do you want to save this game?";
             string caption = "Minesweeper";
-            MessageBoxButton button = MessageBoxButton.OK;
+            MessageBoxButton button = MessageBoxButton.YesNo;
             MessageBoxImage icon = MessageBoxImage.Information;
-            MessageBox.Show(messageBoxText, caption, button, icon);
+            var result = MessageBox.Show(messageBoxText, caption, button, icon);
+
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
+                        "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
+                    break;
+                case MessageBoxResult.No:
+                    break;
+            }
         }
 
         #endregion

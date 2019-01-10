@@ -29,12 +29,14 @@ namespace MineSweeper
         public delegate bool OpenBlock(int x, int y);
         public delegate void OpenEmpty(int x, int y);
         public delegate void FlagBlock(int x, int y);
+        public delegate void ClickBlock(int x, int y, Mine mine);
 
         public InBorder inBorder;
         public LRClick lRClick;
         public OpenBlock openBlock;
         public OpenEmpty openEmpty;
         public FlagBlock flagBlock;
+        public ClickBlock clickBlock;
 
         public AutoPlayer(int row, int col, Mine[,] mines, Rectangle[,] rectangles)
         {

@@ -19,9 +19,6 @@ namespace MineSweeper
     /// </summary>
     public partial class SettingWindow : Window
     {
-        private int rows;
-        private int cols;
-        private int mines;
         public SettingWindow()
         {
             InitializeComponent();
