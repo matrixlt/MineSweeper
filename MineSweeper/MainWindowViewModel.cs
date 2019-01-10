@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -27,7 +26,7 @@ namespace MineSweeper
         private bool both_down = false;
 
         private int mine_size = 25;
-        private int height_margin = 100;
+        private int height_margin = 150;
         private int width_margin = 75;
         private int height;
         private int width;
