@@ -264,9 +264,10 @@ namespace MineSweeper
             return false;
         }
 
-        private void OpenEmpty(int x, int y)//opt needed
+        private bool OpenEmpty(int x, int y)//opt needed
         {
-            OpenBlock(x, y);
+            if (OpenBlock(x, y))
+                return true;
 
             for (int i = x - 1; i < x + 2; i++)
             {
@@ -276,15 +277,19 @@ namespace MineSweeper
                     {
                         if (Mines[i, j].mine_count == 0 && Mines[i, j].is_cover)
                         {
-                            OpenEmpty(i, j);
+                            if (OpenEmpty(i, j))
+                                return true;
                         }
                         else
                         {
-                            OpenBlock(i, j);
+                            if (OpenBlock(i, j))
+                                return true;
                         }
                     }
                 }
             }
+
+            return false;
         }
 
         public void LRClick(int x, int y)//win or lose in it
