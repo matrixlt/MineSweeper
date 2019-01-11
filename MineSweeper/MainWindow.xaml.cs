@@ -22,6 +22,7 @@ namespace MineSweeper
     {
         MainWindowViewModel VM;
         SaveAndLoad SL;
+        int delay = 500;
         public MainWindow()
         {
             VM = new MainWindowViewModel();
@@ -152,16 +153,27 @@ namespace MineSweeper
             ComplexSolve();
         }
 
-        private void AutoTest(object sender, RoutedEventArgs e)
+        private async void AutoTest(object sender, RoutedEventArgs e)
         {
             VM.Cheat_mode = true;
             if (!VM.In_game)
-                VM.player.RandomClick();
+            {
+                if (VM.player.RandomClick())
+                    return;
+                else await Task.Delay(delay); 
+            }
+                
             while (VM.In_game)
             {
                 ComplexSolve();
+                await Task.Delay(delay);
                 if (VM.In_game)
-                    VM.player.RandomClick();
+                {
+                    if (VM.player.RandomClick())
+                        return;
+                    else await Task.Delay(delay);
+                }
+                    
             }
         }
 
@@ -198,7 +210,7 @@ namespace MineSweeper
             Console.WriteLine("WIN {0}   LOSE {1}", win, lose);
         }
 
-        private void SimpleSolve()
+        private async void SimpleSolve()
         {
             bool click = true;
             bool flag = true;
@@ -215,13 +227,20 @@ namespace MineSweeper
 
                 flag = VM.player.SimpleTest(VM.player.SimpleFlag);
                 if (flag)
+                {
+                    await Task.Delay(delay);
                     count_flag++;
+                }
+                    
 
                 while (click)
                 {
                     click = VM.player.SimpleTest(VM.player.SimpleClick);
                     if (click)
+                    {
+                        await Task.Delay(delay);
                         count_click++;
+                    }
                 }
                 i++;
                 if (record_click == count_click && record_flag == count_flag)
@@ -229,21 +248,44 @@ namespace MineSweeper
             }
         }
 
-        private void ComplexSolve()
+        private async void ComplexSolve()
         {
             bool test = false;
             while (true)
             {
                 Console.WriteLine("0");
                 SimpleSolve();
+                {
+                    if (VM.Is_Finished)
+                        return;
+                    await Task.Delay(delay);
+                }
                 Console.WriteLine("1{0}", test);
                 test = test || VM.player.SimpleTest(VM.player.ComplexClick);
+                if (test)
+                {
+                    if (VM.Is_Finished)
+                        return;
+                    await Task.Delay(delay);
+                }
+
                 Console.WriteLine("2{0}", test);
                 test = test || VM.player.SimpleTest(VM.player.ComplexFlag);
+                if (test)
+                    await Task.Delay(delay);
                 Console.WriteLine("3{0}", test);
                 test = test || VM.player.SimpleTest(VM.player.UncertainComplexFlag);
+                if (test)
+                    await Task.Delay(delay);
                 Console.WriteLine("4{0}", test);
                 test = test || VM.player.SimpleTest(VM.player.CompleteAnalyze);
+                if (test)
+                {
+                    if (VM.Is_Finished)
+                        return;
+                    await Task.Delay(delay);
+                }
+                    
                 Console.WriteLine("5{0}", test);
                 if (!test)
                 { return; }

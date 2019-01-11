@@ -69,7 +69,7 @@ namespace MineSweeper
         {
             game = new Game();
             game.Random = random;
-            Distribution = game.Generate(16, 30, 99);
+            Distribution = game.Generate(8, 8, 10);
             game.game_type = GameType.Expert;
             Row = game.row;
             Col = game.col;
@@ -246,6 +246,7 @@ namespace MineSweeper
             }
             else
             {
+                Mines[x, y].is_cover = false;
                 Rectangles[x, y].Fill = BlockBrush.mine;
                 borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
                 LoseGame();
@@ -257,6 +258,7 @@ namespace MineSweeper
             {
                 this.Left_mine = "000";
                 WinGame();
+                Console.WriteLine("test {0} {1}", x, y);
                 Restart();
                 return true;
             }
@@ -467,6 +469,7 @@ namespace MineSweeper
         public int Count_flag { get => count_flag; set => count_flag = value; }
         public GameType Type { get => game.game_type; set => game.game_type = value; }
         public bool Cheat_mode { get => cheat_mode; set => cheat_mode = value; }
+        public bool Is_Finished { get => game.IsFinish(Mines); }
         #endregion
 
         #region helpers in class
@@ -524,7 +527,7 @@ namespace MineSweeper
             return (x >= 0 && x < row && y >= 0 && y < col);
         }
 
-        public void WinGame()
+        public  void WinGame()
         {
             dispatcherTimer.Stop();
 
@@ -543,17 +546,24 @@ namespace MineSweeper
             string caption = "Minesweeper";
             MessageBoxButton button = MessageBoxButton.YesNo;
             MessageBoxImage icon = MessageBoxImage.Information;
-            var result = MessageBox.Show(messageBoxText, caption, button, icon);
-
-            switch (result)
+            //if (Cheat_mode)
+            if(false)
             {
-                case MessageBoxResult.Yes:
-                    SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
-                        "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
-                    break;
-                case MessageBoxResult.No:
-                    break;
+                new WinWindow().Show();
+            }else
+            {
+                var result = MessageBox.Show(messageBoxText, caption, button, icon);
+                switch (result)
+                {
+                    case MessageBoxResult.Yes:
+                        SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
+                            "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
+                        break;
+                    case MessageBoxResult.No:
+                        break;
+                }
             }
+
         }
 
         public void LoseGame()
@@ -567,17 +577,26 @@ namespace MineSweeper
             string caption = "Minesweeper";
             MessageBoxButton button = MessageBoxButton.YesNo;
             MessageBoxImage icon = MessageBoxImage.Information;
-            var result = MessageBox.Show(messageBoxText, caption, button, icon);
-
-            switch (result)
+            if (Cheat_mode)
             {
-                case MessageBoxResult.Yes:
-                    SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
-                        "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
-                    break;
-                case MessageBoxResult.No:
-                    break;
+                new LoseWindow().Show();
             }
+            else
+            {
+                var result = MessageBox.Show(messageBoxText, caption, button, icon);
+
+                switch (result)
+                {
+                    case MessageBoxResult.Yes:
+                        SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
+                            "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
+                        break;
+                    case MessageBoxResult.No:
+                        break;
+                }
+            }
+
+
         }
 
         #endregion

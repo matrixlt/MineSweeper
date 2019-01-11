@@ -369,7 +369,8 @@ namespace MineSweeper
                             }
                             else
                             {
-                                openEmpty(p.x, p.y);
+                                if (openEmpty(p.x, p.y))
+                                    return true;
                             }
                         }
 
@@ -447,8 +448,8 @@ namespace MineSweeper
                                 {
                                     if (mines[p.x, p.y].mine_count == 0)
                                     {
-                                        openEmpty(p.x, p.y);
-                                        return true;
+                                        if(openEmpty(p.x, p.y))
+                                            return true;
                                     }
 
                                     else
@@ -495,7 +496,7 @@ namespace MineSweeper
                                 {
                                     if (mines[p.x, p.y].mine_count == 0)
                                     {
-                                        openEmpty(p.x, p.y);
+                                        if(openEmpty(p.x, p.y))
                                         return true;
                                     }
 
@@ -606,7 +607,7 @@ namespace MineSweeper
             return false;
         }
 
-        public void RandomClick()
+        public bool RandomClick()
         {
             var all_possible = new List<Position> { };
             for (int x = 0; x < row; x++)
@@ -623,14 +624,27 @@ namespace MineSweeper
             int choose = random.Next(0, all_possible.Count);
             if (all_possible.Count == 0)
             {
-                return;
+                return true;
             }
             else
             {
                 if (mines[all_possible[choose].x, all_possible[choose].y].mine_count == 0)
-                    openEmpty(all_possible[choose].x, all_possible[choose].y);
-                else openBlock(all_possible[choose].x, all_possible[choose].y);
+                {
+                    if (openEmpty(all_possible[choose].x, all_possible[choose].y))
+                        return true;
+                }
+
+                else
+                {
+                    if (openBlock(all_possible[choose].x, all_possible[choose].y))
+                        return true;
+                }
             }
+
+            if (mines[all_possible[choose].x, all_possible[choose].y].is_mine)
+                return true;
+
+            return false;
 
         }
 
