@@ -33,7 +33,6 @@ namespace MineSweeper
         public InBorder inBorder;
         public LRClick lRClick;
         public OpenBlock openBlock;
-        public OpenEmpty openEmpty;
         public FlagBlock flagBlock;
         public ClickBlock clickBlock;
 
@@ -396,16 +395,8 @@ namespace MineSweeper
                         }
                         else
                         {
-                            if (mines[p.x, p.y].mine_count != 0)
-                            {
-                                if (openBlock(p.x, p.y))
-                                    return true;//win or lose
-                            }
-                            else
-                            {
-                                if (openEmpty(p.x, p.y))
-                                    return true;
-                            }
+                            if (openBlock(p.x, p.y))
+                                return true;//win or lose
                         }
 
 
@@ -481,17 +472,8 @@ namespace MineSweeper
                             }
                             else
                             {
-                                if (mines[p.x, p.y].mine_count == 0)
-                                {
-                                    if (openEmpty(p.x, p.y))
-                                        return true;
-                                }
-
-                                else
-                                {
-                                    if (openBlock(p.x, p.y))
-                                        return true;
-                                }
+                                if (openBlock(p.x, p.y))
+                                    return true;
                             }
                         }
                         return true;
@@ -529,17 +511,8 @@ namespace MineSweeper
                             }
                             else
                             {
-                                if (mines[p.x, p.y].mine_count == 0)
-                                {
-                                    if (openEmpty(p.x, p.y))
-                                        return true;
-                                }
-
-                                else
-                                {
-                                    if (openBlock(p.x, p.y))
-                                        return true;
-                                }
+                                if (openBlock(p.x, p.y))
+                                    return true;
                             }
 
                         }
@@ -663,17 +636,9 @@ namespace MineSweeper
             }
             else
             {
-                if (mines[all_possible[choose].x, all_possible[choose].y].mine_count == 0)
-                {
-                    if (openEmpty(all_possible[choose].x, all_possible[choose].y))
-                        return true;
-                }
+                if (openBlock(all_possible[choose].x, all_possible[choose].y))
+                    return true;
 
-                else
-                {
-                    if (openBlock(all_possible[choose].x, all_possible[choose].y))
-                        return true;
-                }
             }
 
             if (mines[all_possible[choose].x, all_possible[choose].y].is_mine)

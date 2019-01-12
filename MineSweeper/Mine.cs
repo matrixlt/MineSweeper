@@ -31,5 +31,15 @@ namespace MineSweeper
 
         }
 
+        public bool Is_blank
+        {
+            get
+            {
+                if (mine_count == 0)
+                    return true;
+                else return false;
+            }
+        }
+
     }
 }

@@ -86,10 +86,9 @@ namespace MineSweeper
             player.inBorder = InBorder;
             player.lRClick = LRClick;
             player.openBlock = OpenBlock;
-            player.openEmpty = OpenEmpty;
             player.flagBlock = FlagBlock;
             player.borders = BorderSet;
-            //player.clickBlock = ClickBlock;
+
             record = new Record();
         }
         #endregion
@@ -143,45 +142,11 @@ namespace MineSweeper
             int x, y;                                     //position
             Mine mine = WhichMine(s, out x, out y);       //FIX LATER
 
-            //Console.WriteLine(sender.ToString());
-            //Console.WriteLine(mine.mine_count);
-
-            if (mine.is_flag)
+            if (mine.is_flag || !mine.is_cover)
                 return;
 
-            if (first_click)
-            {                                       //TODO start a game or modify sth ,start the timer or sth
-                In_game = true;
-                first_click = false;
-                dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
-                dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
-                dispatcherTimer.Start();
-                if (mine.is_mine)
-                {
-                    Restart(x, y);
-                    return;
-                }
+            OpenBlock(x, y);
 
-            }
-
-            if (mine.is_cover)
-            {
-                if (mine.is_mine)
-                {
-                    In_game = false;
-                    s.Fill = BlockBrush.mine;
-                    borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
-                    dispatcherTimer.Stop();
-                    total_time = 0;
-                    LoseGame();
-                    Restart();
-                }
-                else
-                {
-                    if (ClickBlock(x, y, mine))
-                        return;
-                }
-            }
 
             if (game.IsFinish(Mines))
             {
@@ -233,12 +198,13 @@ namespace MineSweeper
                 dispatcherTimer.Start();
                 if (mines[x, y].is_mine)
                 {
-                    Restart(x, y);
-                    return true;
+                    Restart(x, y);                  //to ensure not hit mine at first move
+                    return false;                   //not right, but temp
                 }
 
             }
 
+            Mines[x, y].is_cover = false;
             if (!Mines[x, y].is_mine)
             {
                 if (!test_mode)
@@ -246,50 +212,36 @@ namespace MineSweeper
             }
             else
             {
-                Mines[x, y].is_cover = false;
                 Rectangles[x, y].Fill = BlockBrush.mine;
                 borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
                 LoseGame();
                 Restart();
                 return true;
             }
-            Mines[x, y].is_cover = false;
-            if (game.IsFinish(Mines))
-            {
-                this.Left_mine = "000";
-                WinGame();
-                Console.WriteLine("test {0} {1}", x, y);
-                Restart();
-                return true;
-            }
-            return false;
-        }
 
-        private bool OpenEmpty(int x, int y)//opt needed
-        {
-            if (OpenBlock(x, y))
-                return true;
-
-            for (int i = x - 1; i < x + 2; i++)
+            if (Mines[x, y].Is_blank)
             {
-                for (int j = y - 1; j < y + 2; j++)
+                for (int i = x - 1; i < x + 2; i++)
                 {
-                    if (InBorder(i, j))
+                    for (int j = y - 1; j < y + 2; j++)
                     {
-                        if (Mines[i, j].mine_count == 0 && Mines[i, j].is_cover)
+                        if (InBorder(i, j) && Mines[i,j].is_cover)
                         {
-                            if (OpenEmpty(i, j))
-                                return true;
-                        }
-                        else
-                        {
-                            if (OpenBlock(i, j))
-                                return true;
+                            OpenBlock(i, j);
                         }
                     }
                 }
             }
 
+
+            if (game.IsFinish(Mines))
+            {
+                this.Left_mine = "000";
+                WinGame();
+                //Console.WriteLine("test {0} {1}", x, y);
+                Restart();
+                return true;
+            }
             return false;
         }
 
@@ -301,7 +253,7 @@ namespace MineSweeper
                 {
                     if (InBorder(i, j) && !Mines[i, j].is_flag)
                     {
-                        if (ClickBlock(i, j, Mines[i, j]))
+                        if (OpenBlock(i, j))
                             return;
                     }
 
@@ -317,18 +269,6 @@ namespace MineSweeper
             Rectangles[x, y].Fill = BlockBrush.flag;
         }
 
-        public bool ClickBlock(int x, int y, Mine mine)//need to modify, need to test
-        {
-            if (mine.mine_count == 0)
-                OpenEmpty(x, y);
-            else
-            {
-                if (OpenBlock(x, y))
-                    return true;
-            }
-
-            return false;
-        }
         #endregion
 
         #region binding
@@ -661,9 +601,9 @@ namespace MineSweeper
                     Mines[i, j] = mymine;
                 }
             }
-            if (Mines[x, y].mine_count != 0)
-                OpenBlock(x, y);
-            else OpenEmpty(x, y);
+
+            OpenBlock(x, y);
+
 
             player.SetProperties(row, col, Mines, Rectangles);
 
