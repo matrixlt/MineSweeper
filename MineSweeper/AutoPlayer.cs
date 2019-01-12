@@ -26,15 +26,12 @@ namespace MineSweeper
         public delegate bool InBorder(int x, int y);
         public delegate void LRClick(int x, int y);
         public delegate bool OpenBlock(int x, int y);
-        public delegate bool OpenEmpty(int x, int y);
         public delegate void FlagBlock(int x, int y);
-        public delegate void ClickBlock(int x, int y, Mine mine);
 
         public InBorder inBorder;
         public LRClick lRClick;
         public OpenBlock openBlock;
         public FlagBlock flagBlock;
-        public ClickBlock clickBlock;
 
         #region helpers
         public AutoPlayer(int row, int col, Mine[,] mines, Rectangle[,] rectangles)
@@ -102,10 +99,10 @@ namespace MineSweeper
                     }
                 }
             }
-            foreach (Position p in result)
-            {
-                //Console.WriteLine("here{0}", p.x);
-            }
+            //foreach (Position p in result)
+            //{
+            //    Console.WriteLine("here{0}", p.x);
+            //}
             return result;
         }
 
@@ -172,22 +169,36 @@ namespace MineSweeper
             }
             return effective;
         }
-        public bool SimpleTest(Hint f)//for old codes
+
+        public bool SimpleTest(Hint f)// test all uncovered block that is not 0, and return if sth is done 
         {
             bool effective = false;
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
                 {
-                    if (!mines[i, j].is_cover)
+                    if (!mines[i, j].is_cover && !mines[i, j].Is_blank)
                     {
                         bool test = f(i, j);
-                        effective = test || effective;
+                        if (!effective && test)
+                            effective = true;
                     }
 
                 }
             }
             return effective;
+        }
+
+        public void SimpleHint(Hint f)
+        {
+            for (int x = 0; x < row; x++)
+            {
+                for (int y = 0; y < col; y++)
+                {
+                    if (!mines[x, y].is_cover && mines[x, y].mine_count != 0 && f(x, y, true))
+                        return;
+                }
+            }
         }
 
         public bool SimpleFlag(int x, int y, bool hint_mode = false)
@@ -196,30 +207,27 @@ namespace MineSweeper
             int flag_count = info.flag_count;
             int unflag_count = info.unflag_count;
 
+            if (unflag_count == 0 || unflag_count + flag_count != mines[x, y].mine_count)
+                return false;
 
-            if (unflag_count + flag_count == mines[x, y].mine_count)
+            for (int i = x - 1; i < x + 2; i++)
             {
-                for (int i = x - 1; i < x + 2; i++)
+                for (int j = y - 1; j < y + 2; j++)
                 {
-                    for (int j = y - 1; j < y + 2; j++)
+                    if (inBorder(i, j) && mines[i, j].is_cover)
                     {
-                        if (inBorder(i, j) && mines[i, j].is_cover)
+                        if (!mines[i, j].is_flag)
                         {
-                            if (!mines[i, j].is_flag)
+                            if (hint_mode)
                             {
-                                if (hint_mode)//animation
-                                {
-                                    ShowAnimation(i, j);
-                                }
-                                else flagBlock(i, j);
+                                ShowAnimation(i, j);
                             }
+                            else flagBlock(i, j);
                         }
                     }
                 }
-                if (unflag_count > 0)
-                    return true;
             }
-            return false;
+            return true;
         }
 
         public bool SimpleClick(int x, int y, bool hint_mode = false)
@@ -228,22 +236,20 @@ namespace MineSweeper
             int flag_count = info.flag_count;
             int unflag_count = info.unflag_count;
 
-            if (flag_count == mines[x, y].mine_count)
+            if (unflag_count == 0 || flag_count != mines[x, y].mine_count)
+                return false;
+
+            if (hint_mode)
             {
-                if (hint_mode && unflag_count != 0)
+                var block_set = GetBlockSet(x, y, true);
+                foreach (Position p in block_set)
                 {
-                    var block_set = GetBlockSet(x, y, true);
-                    foreach (Position p in block_set)
-                    {
-                        ShowAnimation(p.x, p.y);
-                    }
-                    return true;
+                    ShowAnimation(p.x, p.y);
                 }
-                lRClick(x, y);
-                if (unflag_count != 0)
-                    return true;
             }
-            return false;
+            else lRClick(x, y);
+            return true;
+
         }
 
         public bool UncertainComplexFlag(int x, int y, bool hint_mode = false)//analyze in 3*3, opt needed
@@ -335,11 +341,12 @@ namespace MineSweeper
                     units[i].comfirmed_mine_count < center.comfirmed_mine_count)
                 {
                     int mine_diff = center.comfirmed_mine_count - units[i].comfirmed_mine_count;
-                    center.Simplified_blocks.ExceptWith(units[i].Simplified_blocks);
-                    int block_diff = center.Simplified_blocks.Count;
+                    var new_set = new HashSet<Position>(center.Simplified_blocks);
+                    new_set.ExceptWith(units[i].Simplified_blocks);
+                    int block_diff = new_set.Count;
                     if (mine_diff == block_diff)
                     {
-                        foreach (Position p in center.Simplified_blocks)
+                        foreach (Position p in new_set)
                         {
                             if (hint_mode)
                                 ShowAnimation(p.x, p.y);
@@ -347,14 +354,9 @@ namespace MineSweeper
                         }
                         return true;
                     }
-                    else
-                    {
-                        center.Simplified_blocks.UnionWith(units[i].Simplified_blocks);
-                    }
 
                 }
             }
-
 
             return false;
         }
@@ -648,17 +650,7 @@ namespace MineSweeper
 
         }
 
-        public void SimpleHint(Hint f)
-        {
-            for (int x = 0; x < row; x++)
-            {
-                for (int y = 0; y < col; y++)
-                {
-                    if (!mines[x, y].is_cover && mines[x, y].mine_count != 0 && f(x, y, true))
-                        return;
-                }
-            }
-        }
+
 
         #endregion
 
