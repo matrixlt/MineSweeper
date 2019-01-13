@@ -18,6 +18,7 @@ namespace MineSweeper
         private bool in_game = false;
         private bool first_click = true;
         private bool? last_win = null;
+        private GameState game_state = GameState.NotStart;
         private bool test_mode = false;
         private bool cheat_mode = false;
         private int row;
@@ -88,6 +89,7 @@ namespace MineSweeper
             player.openBlock = OpenBlock;
             player.flagBlock = FlagBlock;
             player.borders = BorderSet;
+            player.getGameState = GetGameState;
 
             record = new Record();
         }
@@ -154,7 +156,7 @@ namespace MineSweeper
                 total_time = 0.001 * ((DateTime.Now - start_time).TotalMilliseconds % 1000) + (DateTime.Now - start_time).TotalMilliseconds / 1000;
                 Left_mine = "000";
                 WinGame();
-                Restart();
+                //Restart();
             }
 
         }
@@ -193,6 +195,7 @@ namespace MineSweeper
             {                                       //TODO start a game or modify sth ,start the timer or sth
                 In_game = true;
                 first_click = false;
+                Game_state = GameState.On;
                 dispatcherTimer.Tick += new EventHandler(dispatcherTimer_Tick);
                 dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 10);
                 dispatcherTimer.Start();
@@ -215,7 +218,8 @@ namespace MineSweeper
                 Rectangles[x, y].Fill = BlockBrush.mine;
                 borders[x * col + y].Background = new SolidColorBrush(Colors.Red);
                 LoseGame();
-                Restart();
+                Game_state = GameState.Lose;
+                //Restart();
                 return true;
             }
 
@@ -238,10 +242,12 @@ namespace MineSweeper
             {
                 this.Left_mine = "000";
                 WinGame();
+                Game_state = GameState.Win;
                 //Console.WriteLine("test {0} {1}", x, y);
-                Restart();
+                //Restart();
                 return true;
             }
+            
             return false;
         }
 
@@ -253,7 +259,8 @@ namespace MineSweeper
                 {
                     if (InBorder(i, j) && !Mines[i, j].is_flag)
                     {
-                        if (OpenBlock(i, j))
+                        OpenBlock(i, j);
+                        if (Game_state == GameState.Lose || Game_state == GameState.Win)
                             return;
                     }
 
@@ -410,6 +417,11 @@ namespace MineSweeper
         public GameType Type { get => game.game_type; set => game.game_type = value; }
         public bool Cheat_mode { get => cheat_mode; set => cheat_mode = value; }
         public bool Is_Finished { get => game.IsFinish(Mines); }
+        public GameState Game_state { get => game_state; set => game_state = value; }
+        public GameState GetGameState()
+        {
+            return Game_state;
+        }
         #endregion
 
         #region helpers in class
@@ -546,6 +558,7 @@ namespace MineSweeper
         {
             In_game = false;
             first_click = true;
+            Game_state = GameState.NotStart;
             first_interval = true;
 
             dispatcherTimer.Stop();
@@ -619,6 +632,7 @@ namespace MineSweeper
         {
             In_game = false;
             first_click = true;
+            Game_state = GameState.NotStart;
             first_interval = true;
 
             dispatcherTimer.Stop();
@@ -653,6 +667,7 @@ namespace MineSweeper
         {
             In_game = false;
             first_click = true;
+            Game_state = GameState.NotStart;
             first_interval = true;
 
             dispatcherTimer.Stop();

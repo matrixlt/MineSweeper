@@ -27,11 +27,13 @@ namespace MineSweeper
         public delegate void LRClick(int x, int y);
         public delegate bool OpenBlock(int x, int y);
         public delegate void FlagBlock(int x, int y);
+        public delegate GameState GetGameState();
 
         public InBorder inBorder;
         public LRClick lRClick;
         public OpenBlock openBlock;
         public FlagBlock flagBlock;
+        public GetGameState getGameState;
 
         #region helpers
         public AutoPlayer(int row, int col, Mine[,] mines, Rectangle[,] rectangles)
@@ -397,7 +399,8 @@ namespace MineSweeper
                         }
                         else
                         {
-                            if (openBlock(p.x, p.y))
+                            openBlock(p.x, p.y);
+                            if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
                                 return true;//win or lose
                         }
 
@@ -474,8 +477,10 @@ namespace MineSweeper
                             }
                             else
                             {
-                                if (openBlock(p.x, p.y))
-                                    return true;
+                                openBlock(p.x, p.y);
+                                if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                                    return true;//win or lose
+
                             }
                         }
                         return true;
@@ -513,8 +518,9 @@ namespace MineSweeper
                             }
                             else
                             {
-                                if (openBlock(p.x, p.y))
-                                    return true;
+                                openBlock(p.x, p.y);
+                                if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                                    return true;//win or lose
                             }
 
                         }
@@ -607,8 +613,9 @@ namespace MineSweeper
                     for (int j = 0; j < col; j++)
                     {
                         if (mines[i, j].is_cover && !mines[i, j].is_flag)
-                            if (openBlock(i, j))
-                                return true;
+                            openBlock(i, j);
+                        if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                            return true;//win or lose
                     }
                 }
                 return true;
@@ -638,13 +645,14 @@ namespace MineSweeper
             }
             else
             {
-                if (openBlock(all_possible[choose].x, all_possible[choose].y))
-                    return true;
+                openBlock(all_possible[choose].x, all_possible[choose].y);
+                if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                    return true;//win or lose
 
             }
 
-            if (mines[all_possible[choose].x, all_possible[choose].y].is_mine)
-                return true;
+            //if (mines[all_possible[choose].x, all_possible[choose].y].is_mine)
+            //    return true;
 
             return false;
 

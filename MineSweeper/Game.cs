@@ -14,6 +14,14 @@ namespace MineSweeper
         Customized
     }
 
+    public enum GameState
+    {
+        NotStart,
+        On,
+        Win,
+        Lose
+    }
+
     public class Game
     {
         private Random random;
