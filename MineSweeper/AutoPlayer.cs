@@ -25,7 +25,7 @@ namespace MineSweeper
         public delegate bool Hint(int x, int y, bool mode = false);
         public delegate bool InBorder(int x, int y);
         public delegate void LRClick(int x, int y);
-        public delegate bool OpenBlock(int x, int y);
+        public delegate void OpenBlock(int x, int y);
         public delegate void FlagBlock(int x, int y);
         public delegate GameState GetGameState();
 

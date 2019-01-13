@@ -189,8 +189,10 @@ namespace MineSweeper
         #endregion
 
         #region block operation
-        public bool OpenBlock(int x, int y)
+        public void OpenBlock(int x, int y)
         {
+            if (Game_state == GameState.Win || Game_state == GameState.Lose)//no move
+                return;
             if (first_click)
             {                                       //TODO start a game or modify sth ,start the timer or sth
                 In_game = true;
@@ -202,7 +204,7 @@ namespace MineSweeper
                 if (mines[x, y].is_mine)
                 {
                     Restart(x, y);                  //to ensure not hit mine at first move
-                    return false;                   //not right, but temp
+                    return;                   //not right, but temp
                 }
 
             }
@@ -220,7 +222,7 @@ namespace MineSweeper
                 LoseGame();
                 Game_state = GameState.Lose;
                 //Restart();
-                return true;
+                return;
             }
 
             if (Mines[x, y].Is_blank)
@@ -245,10 +247,10 @@ namespace MineSweeper
                 Game_state = GameState.Win;
                 //Console.WriteLine("test {0} {1}", x, y);
                 //Restart();
-                return true;
+                return ;
             }
             
-            return false;
+            return ;
         }
 
         public void LRClick(int x, int y)//win or lose in it
@@ -270,6 +272,9 @@ namespace MineSweeper
 
         public void FlagBlock(int x, int y)//one way, just flag, not include unflag
         {
+            if (Game_state == GameState.Win || Game_state == GameState.Lose)//no move
+                return;
+
             Mines[x, y].is_flag = true;
             if (test_mode)
                 return;
