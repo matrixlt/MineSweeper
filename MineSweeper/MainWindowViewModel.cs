@@ -231,7 +231,7 @@ namespace MineSweeper
                 {
                     for (int j = y - 1; j < y + 2; j++)
                     {
-                        if (InBorder(i, j) && Mines[i,j].is_cover)
+                        if (InBorder(i, j) && Mines[i, j].is_cover)
                         {
                             OpenBlock(i, j);
                         }
@@ -247,10 +247,10 @@ namespace MineSweeper
                 Game_state = GameState.Win;
                 //Console.WriteLine("test {0} {1}", x, y);
                 //Restart();
-                return ;
+                return;
             }
-            
-            return ;
+
+            return;
         }
 
         public void LRClick(int x, int y)//win or lose in it
@@ -484,7 +484,7 @@ namespace MineSweeper
             return (x >= 0 && x < row && y >= 0 && y < col);
         }
 
-        public  void WinGame()
+        public void WinGame()
         {
             dispatcherTimer.Stop();
 
@@ -503,205 +503,191 @@ namespace MineSweeper
             string caption = "Minesweeper";
             MessageBoxButton button = MessageBoxButton.YesNo;
             MessageBoxImage icon = MessageBoxImage.Information;
-            //if (Cheat_mode)
-            if(false)
+
+            var result = MessageBox.Show(messageBoxText, caption, button, icon);
+            switch (result)
             {
-                new WinWindow().Show();
-            }else
-            {
-                var result = MessageBox.Show(messageBoxText, caption, button, icon);
-                switch (result)
-                {
-                    case MessageBoxResult.Yes:
-                        SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
-                            "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
-                        break;
-                    case MessageBoxResult.No:
-                        break;
-                }
+                case MessageBoxResult.Yes:
+                    SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
+                        "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
+                    break;
+                case MessageBoxResult.No:
+                    break;
             }
 
-        }
-
-        public void LoseGame()
-        {
-            Last_win = false;
-            if (Test_mode)
-                return;
-            SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path + Game.id.ToString() + ".txt");
-            string messageBoxText = "You just hit a mine!";
-            messageBoxText += "\n Do you want to save this game?";
-            string caption = "Minesweeper";
-            MessageBoxButton button = MessageBoxButton.YesNo;
-            MessageBoxImage icon = MessageBoxImage.Information;
-            if (Cheat_mode)
-            {
-                new LoseWindow().Show();
-            }
-            else
-            {
-                var result = MessageBox.Show(messageBoxText, caption, button, icon);
-
-                switch (result)
-                {
-                    case MessageBoxResult.Yes:
-                        SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
-                            "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
-                        break;
-                    case MessageBoxResult.No:
-                        break;
-                }
-            }
-
-
-        }
-
-        #endregion
-
-        #region restart a game
-        public void Restart()                           //much more things to do,such as frash AutoPlayer
-        {
-            In_game = false;
-            first_click = true;
-            Game_state = GameState.NotStart;
-            first_interval = true;
-
-            dispatcherTimer.Stop();
-            this.Show_time = "000";
-
-            foreach (Rectangle r in Rectangles)
-            {
-                r.Fill = Brushes.AliceBlue;
-            }
-            foreach (Border b in borders)
-            {
-                b.Background = new SolidColorBrush(Colors.Tan);
-            }
-            Cheat_mode = false;
-            GameType temp = game.game_type;             //fix later
-            game = new Game();
-            game.game_type = temp;
-
-
-            game.Random = random;
-            Count_flag = 0;
-            Left_mine = (Mine_number - Count_flag).ToString("D3");
-
-            Distribution = game.Generate(row, col, mine_number);
-            player.SetProperties(row, col, Mines, Rectangles);
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    Mine mymine = new Mine(game.GetMineCount(i, j));
-                    Mines[i, j] = mymine;
-                }
-            }
-
-        }
-
-        public void Restart(int x, int y)               //opt needed
-        {
-            GameType temp = game.game_type;                 //fix later
-
-            while (game.GetMineCount(x, y) == -1)
-            {
-                game = new Game();
-                game.Random = random;
-                Distribution = game.Generate(row, col, mine_number);
-            }
-            game.game_type = temp;
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    Mine mymine = new Mine(game.GetMineCount(i, j));
-                    Mines[i, j] = mymine;
-                }
-            }
-
-            OpenBlock(x, y);
-
-
-            player.SetProperties(row, col, Mines, Rectangles);
-
-            if (game.IsFinish(Mines))
-            {
-                Left_mine = "000";
-                WinGame();
-                Restart();
-            }
-        }
-
-        public void Restart(int[,] distribution)
-        {
-            In_game = false;
-            first_click = true;
-            Game_state = GameState.NotStart;
-            first_interval = true;
-
-            dispatcherTimer.Stop();
-            this.Show_time = "000";
-
-            game = new Game(distribution);
-            game.Random = random;
-            Row = game.row;
-            Col = game.col;
-            Mine_number = game.mine_number;
-            Count_flag = 0;
-            Left_mine = (Mine_number - Count_flag).ToString("D3");
-
-            Ininitialize(game);
-            Height = mine_size * Row;
-            Width = mine_size * Col;
-            Main_height = Height + height_margin;
-            Main_width = Width + width_margin;
-            player.SetProperties(row, col, Mines, Rectangles);
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    Mine mymine = new Mine(game.GetMineCount(i, j));
-                    Mines[i, j] = mymine;
-                }
-            }
-
-        }
-
-        public void Restart(int row, int col, int mine_count)
-        {
-            In_game = false;
-            first_click = true;
-            Game_state = GameState.NotStart;
-            first_interval = true;
-
-            dispatcherTimer.Stop();
-            this.Show_time = "000";
-
-            game = new Game();
-            game.Random = random;
-            Distribution = game.Generate(row, col, mine_count);
-            Row = game.row;
-            Col = game.col;
-            Mine_number = game.mine_number;
-            Count_flag = 0;
-            Left_mine = (Mine_number - Count_flag).ToString("D3");
-
-            Ininitialize(game);
-            Height = mine_size * Row;
-            Width = mine_size * Col;
-            Main_height = Height + height_margin;
-            Main_width = Width + width_margin;
-            player.SetProperties(row, col, Mines, Rectangles);
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    Mine mymine = new Mine(game.GetMineCount(i, j));
-                    Mines[i, j] = mymine;
-                }
-            }
-        }
-        #endregion
     }
+
+    public void LoseGame()
+    {
+        Last_win = false;
+        if (Test_mode)
+            return;
+        SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path + Game.id.ToString() + ".txt");
+        string messageBoxText = "You just hit a mine!";
+        messageBoxText += "\n Do you want to save this game?";
+        string caption = "Minesweeper";
+        MessageBoxButton button = MessageBoxButton.YesNo;
+        MessageBoxImage icon = MessageBoxImage.Information;
+
+        var result = MessageBox.Show(messageBoxText, caption, button, icon);
+        switch (result)
+        {
+            case MessageBoxResult.Yes:
+                SaveAndLoad.Save(Row, Col, Distribution, SaveAndLoad.path +
+                    "Minesweeper" + DateTime.Now.ToString().Replace(":", "-").Replace(" ", "-").Replace("/", "-") + ".txt");
+                break;
+            case MessageBoxResult.No:
+                break;
+        }
+
+    }
+
+    #endregion
+
+    #region restart a game
+    public void Restart()                           //much more things to do,such as frash AutoPlayer
+    {
+        In_game = false;
+        first_click = true;
+        Game_state = GameState.NotStart;
+        first_interval = true;
+
+        dispatcherTimer.Stop();
+        this.Show_time = "000";
+
+        foreach (Rectangle r in Rectangles)
+        {
+            r.Fill = Brushes.AliceBlue;
+        }
+        foreach (Border b in borders)
+        {
+            b.Background = new SolidColorBrush(Colors.Tan);
+        }
+        Cheat_mode = false;
+        GameType temp = game.game_type;             //fix later
+        game = new Game();
+        game.game_type = temp;
+
+
+        game.Random = random;
+        Count_flag = 0;
+        Left_mine = (Mine_number - Count_flag).ToString("D3");
+
+        Distribution = game.Generate(row, col, mine_number);
+        player.SetProperties(row, col, Mines, Rectangles);
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < col; j++)
+            {
+                Mine mymine = new Mine(game.GetMineCount(i, j));
+                Mines[i, j] = mymine;
+            }
+        }
+
+    }
+
+    public void Restart(int x, int y)               //opt needed
+    {
+        GameType temp = game.game_type;                 //fix later
+
+        while (game.GetMineCount(x, y) == -1)
+        {
+            game = new Game();
+            game.Random = random;
+            Distribution = game.Generate(row, col, mine_number);
+        }
+        game.game_type = temp;
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < col; j++)
+            {
+                Mine mymine = new Mine(game.GetMineCount(i, j));
+                Mines[i, j] = mymine;
+            }
+        }
+
+        OpenBlock(x, y);
+
+
+        player.SetProperties(row, col, Mines, Rectangles);
+
+        if (game.IsFinish(Mines))
+        {
+            Left_mine = "000";
+            WinGame();
+            Restart();
+        }
+    }
+
+    public void Restart(int[,] distribution)
+    {
+        In_game = false;
+        first_click = true;
+        Game_state = GameState.NotStart;
+        first_interval = true;
+
+        dispatcherTimer.Stop();
+        this.Show_time = "000";
+
+        game = new Game(distribution);
+        game.Random = random;
+        Row = game.row;
+        Col = game.col;
+        Mine_number = game.mine_number;
+        Count_flag = 0;
+        Left_mine = (Mine_number - Count_flag).ToString("D3");
+
+        Ininitialize(game);
+        Height = mine_size * Row;
+        Width = mine_size * Col;
+        Main_height = Height + height_margin;
+        Main_width = Width + width_margin;
+        player.SetProperties(row, col, Mines, Rectangles);
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < col; j++)
+            {
+                Mine mymine = new Mine(game.GetMineCount(i, j));
+                Mines[i, j] = mymine;
+            }
+        }
+
+    }
+
+    public void Restart(int row, int col, int mine_count)
+    {
+        In_game = false;
+        first_click = true;
+        Game_state = GameState.NotStart;
+        first_interval = true;
+
+        dispatcherTimer.Stop();
+        this.Show_time = "000";
+
+        game = new Game();
+        game.Random = random;
+        Distribution = game.Generate(row, col, mine_count);
+        Row = game.row;
+        Col = game.col;
+        Mine_number = game.mine_number;
+        Count_flag = 0;
+        Left_mine = (Mine_number - Count_flag).ToString("D3");
+
+        Ininitialize(game);
+        Height = mine_size * Row;
+        Width = mine_size * Col;
+        Main_height = Height + height_margin;
+        Main_width = Width + width_margin;
+        player.SetProperties(row, col, Mines, Rectangles);
+        for (int i = 0; i < row; i++)
+        {
+            for (int j = 0; j < col; j++)
+            {
+                Mine mymine = new Mine(game.GetMineCount(i, j));
+                Mines[i, j] = mymine;
+            }
+        }
+    }
+    #endregion
+}
 }
