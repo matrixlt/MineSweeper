@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -143,42 +144,52 @@ namespace MineSweeper
         #region AutoTest
         private void SimpleTest(object sender, RoutedEventArgs e)//rare bug??
         {
+            var cts = new CancellationTokenSource();
             VM.Cheat_mode = true;
-            SimpleSolve();
+            SimpleSolve(cts.Token);
         }
 
         private void ComplexTest(object sender, RoutedEventArgs e)//bug not fixed
         {
+            var cts = new CancellationTokenSource();
             VM.Cheat_mode = true;
-            ComplexSolve();
+            ComplexSolve(cts.Token);
         }
 
         private async void AutoTest(object sender, RoutedEventArgs e)
         {
+            var cts = new CancellationTokenSource();
             VM.Cheat_mode = true;
             if (!VM.In_game)
             {
-                if (VM.player.RandomClick())
+                VM.player.RandomClick();
+                if (VM.Game_state == GameState.Lose || VM.Game_state == GameState.Win)
                     return;
-                else await Task.Delay(delay); 
             }
-                
+
             while (VM.In_game)
             {
-                ComplexSolve();
-                await Task.Delay(delay);
+                await ComplexSolve(cts.Token);
+                //await Task.Delay(delay);
                 if (VM.In_game)
                 {
-                    if (VM.player.RandomClick())
+                    VM.player.RandomClick();
+                    if (VM.Game_state == GameState.Lose || VM.Game_state == GameState.Win)
+                    {
+                        Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                        Console.WriteLine("OVER");
+                        cts.Cancel();
                         return;
-                    else await Task.Delay(delay);
+                    }
+                    await Task.Delay(delay);
                 }
-                    
+
             }
         }
 
         private void AutoTest100(object sender, RoutedEventArgs e)
         {
+            var cts = new CancellationTokenSource();
             VM.Cheat_mode = true;
             VM.Test_mode = true;
             int win = 0;
@@ -189,9 +200,9 @@ namespace MineSweeper
                     VM.player.RandomClick();
                 while (VM.In_game)
                 {
-                    SimpleSolve();
-                    ComplexSolve();
-                    SimpleSolve();
+                    SimpleSolve(cts.Token);
+                    ComplexSolve(cts.Token);
+                    SimpleSolve(cts.Token);
                     if (VM.In_game)
                         VM.player.RandomClick();
 
@@ -210,7 +221,7 @@ namespace MineSweeper
             Console.WriteLine("WIN {0}   LOSE {1}", win, lose);
         }
 
-        private async void SimpleSolve()
+        private async void SimpleSolve(CancellationToken ct)
         {
             bool click = true;
             bool flag = true;
@@ -231,13 +242,15 @@ namespace MineSweeper
                     await Task.Delay(delay);
                     count_flag++;
                 }
-                    
+
 
                 while (click)
                 {
                     click = VM.player.SimpleTest(VM.player.SimpleClick);
                     if (click)
                     {
+                        if (VM.Game_state == GameState.Win || VM.Game_state == GameState.Lose)
+                            return;
                         await Task.Delay(delay);
                         count_click++;
                     }
@@ -248,50 +261,62 @@ namespace MineSweeper
             }
         }
 
-        private async void ComplexSolve()
+        private async Task<bool> ComplexSolve(CancellationToken ct)
         {
             bool test = false;
+            bool done;
             while (true)
             {
                 Console.WriteLine("0");
-                SimpleSolve();
+                SimpleSolve(ct);
                 {
-                    if (VM.Is_Finished)
-                        return;
+                    if (VM.Game_state == GameState.Win || VM.Game_state == GameState.Lose)
+                        return true;
                     await Task.Delay(delay);
                 }
+
                 Console.WriteLine("1{0}", test);
-                test = test || VM.player.SimpleTest(VM.player.ComplexClick);
-                if (test)
+                done = VM.player.SimpleTest(VM.player.ComplexClick);
+                test = test || done;
+                if (done)
                 {
-                    if (VM.Is_Finished)
-                        return;
+                    if (VM.Game_state == GameState.Win || VM.Game_state == GameState.Lose)
+                        return true;
                     await Task.Delay(delay);
                 }
 
                 Console.WriteLine("2{0}", test);
-                test = test || VM.player.SimpleTest(VM.player.ComplexFlag);
-                if (test)
+                done = VM.player.SimpleTest(VM.player.ComplexFlag);
+                test = test || done;
+                if (done)
                     await Task.Delay(delay);
+
+
                 Console.WriteLine("3{0}", test);
-                test = test || VM.player.SimpleTest(VM.player.UncertainComplexFlag);
-                if (test)
+                done = VM.player.SimpleTest(VM.player.UncertainComplexFlag);
+                test = test || done;
+                if (done)
                     await Task.Delay(delay);
+
+
                 Console.WriteLine("4{0}", test);
-                test = test || VM.player.SimpleTest(VM.player.CompleteAnalyze);
-                if (test)
+                done = VM.player.SimpleTest(VM.player.CompleteAnalyze);
+                test = test || done;
+                if (done)
                 {
-                    if (VM.Is_Finished)
-                        return;
+                    if (VM.Game_state == GameState.Win || VM.Game_state == GameState.Lose)
+                        return true;
                     await Task.Delay(delay);
                 }
-                    
+
+
                 Console.WriteLine("5{0}", test);
                 if (!test)
-                { return; }
-                else { test = false; }
+                    return true;
+                else test = false;
 
             }
+
         }
         #endregion
 

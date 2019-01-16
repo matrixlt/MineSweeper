@@ -1,5 +1,4 @@
-﻿using Combinatorics.Collections;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,18 +25,17 @@ namespace MineSweeper
         public delegate bool Hint(int x, int y, bool mode = false);
         public delegate bool InBorder(int x, int y);
         public delegate void LRClick(int x, int y);
-        public delegate bool OpenBlock(int x, int y);
-        public delegate bool OpenEmpty(int x, int y);
+        public delegate void OpenBlock(int x, int y);
         public delegate void FlagBlock(int x, int y);
-        public delegate void ClickBlock(int x, int y, Mine mine);
+        public delegate GameState GetGameState();
 
         public InBorder inBorder;
         public LRClick lRClick;
         public OpenBlock openBlock;
-        public OpenEmpty openEmpty;
         public FlagBlock flagBlock;
-        public ClickBlock clickBlock;
+        public GetGameState getGameState;
 
+        #region helpers
         public AutoPlayer(int row, int col, Mine[,] mines, Rectangle[,] rectangles)
         {
             SetProperties(row, col, mines, rectangles);
@@ -103,10 +101,10 @@ namespace MineSweeper
                     }
                 }
             }
-            foreach (Position p in result)
-            {
-                //Console.WriteLine("here{0}", p.x);
-            }
+            //foreach (Position p in result)
+            //{
+            //    Console.WriteLine("here{0}", p.x);
+            //}
             return result;
         }
 
@@ -120,6 +118,40 @@ namespace MineSweeper
 
             rectangles[x, y].BeginAnimation(Rectangle.OpacityProperty, myDoubleAnimation);
         }
+
+        static private List<List<T>> GetAllCombination<T>(List<T> units)
+        {
+            if (units.Count == 0)
+            {
+                var result = new List<List<T>> { };
+                return result;
+            }
+            if (units.Count == 1)
+            {
+                var result = new List<List<T>> { };
+                result.Add(new List<T> { units[0] });
+                return result;
+            }
+            else
+            {
+                T unit = units[0];
+                units.Remove(unit);
+                List<List<T>> result = GetAllCombination<T>(units);
+                List<List<T>> others = new List<List<T>> { };
+                others.Add(new List<T> { unit });
+
+                foreach (List<T> set in result)
+                {
+                    var new_set = new List<T>(set);
+                    new_set.Add(unit);
+                    others.Add(new_set);
+                }
+                var r = new List<List<T>>(result.Union(others));
+
+                return r;
+            }
+        }
+        #endregion
 
         #region AutoPlay
         public bool SimpleTest(AutoPlay f)
@@ -139,22 +171,36 @@ namespace MineSweeper
             }
             return effective;
         }
-        public bool SimpleTest(Hint f)//for old codes
+
+        public bool SimpleTest(Hint f)// test all uncovered block that is not 0, and return if sth is done 
         {
             bool effective = false;
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < col; j++)
                 {
-                    if (!mines[i, j].is_cover)
+                    if (!mines[i, j].is_cover && !mines[i, j].Is_blank)
                     {
                         bool test = f(i, j);
-                        effective = test || effective;
+                        if (!effective && test)
+                            effective = true;
                     }
 
                 }
             }
             return effective;
+        }
+
+        public void SimpleHint(Hint f)
+        {
+            for (int x = 0; x < row; x++)
+            {
+                for (int y = 0; y < col; y++)
+                {
+                    if (!mines[x, y].is_cover && mines[x, y].mine_count != 0 && f(x, y, true))
+                        return;
+                }
+            }
         }
 
         public bool SimpleFlag(int x, int y, bool hint_mode = false)
@@ -163,30 +209,27 @@ namespace MineSweeper
             int flag_count = info.flag_count;
             int unflag_count = info.unflag_count;
 
+            if (unflag_count == 0 || unflag_count + flag_count != mines[x, y].mine_count)
+                return false;
 
-            if (unflag_count + flag_count == mines[x, y].mine_count)
+            for (int i = x - 1; i < x + 2; i++)
             {
-                for (int i = x - 1; i < x + 2; i++)
+                for (int j = y - 1; j < y + 2; j++)
                 {
-                    for (int j = y - 1; j < y + 2; j++)
+                    if (inBorder(i, j) && mines[i, j].is_cover)
                     {
-                        if (inBorder(i, j) && mines[i, j].is_cover)
+                        if (!mines[i, j].is_flag)
                         {
-                            if (!mines[i, j].is_flag)
+                            if (hint_mode)
                             {
-                                if (hint_mode)//animation
-                                {
-                                    ShowAnimation(i, j);
-                                }
-                                else flagBlock(i, j);
+                                ShowAnimation(i, j);
                             }
+                            else flagBlock(i, j);
                         }
                     }
                 }
-                if (unflag_count > 0)
-                    return true;
             }
-            return false;
+            return true;
         }
 
         public bool SimpleClick(int x, int y, bool hint_mode = false)
@@ -195,22 +238,20 @@ namespace MineSweeper
             int flag_count = info.flag_count;
             int unflag_count = info.unflag_count;
 
-            if (flag_count == mines[x, y].mine_count)
+            if (unflag_count == 0 || flag_count != mines[x, y].mine_count)
+                return false;
+
+            if (hint_mode)
             {
-                if (hint_mode && unflag_count != 0)
+                var block_set = GetBlockSet(x, y, true);
+                foreach (Position p in block_set)
                 {
-                    var block_set = GetBlockSet(x, y, true);
-                    foreach (Position p in block_set)
-                    {
-                        ShowAnimation(p.x, p.y);
-                    }
-                    return true;
+                    ShowAnimation(p.x, p.y);
                 }
-                lRClick(x, y);
-                if (unflag_count != 0)
-                    return true;
             }
-            return false;
+            else lRClick(x, y);
+            return true;
+
         }
 
         public bool UncertainComplexFlag(int x, int y, bool hint_mode = false)//analyze in 3*3, opt needed
@@ -302,11 +343,12 @@ namespace MineSweeper
                     units[i].comfirmed_mine_count < center.comfirmed_mine_count)
                 {
                     int mine_diff = center.comfirmed_mine_count - units[i].comfirmed_mine_count;
-                    center.Simplified_blocks.ExceptWith(units[i].Simplified_blocks);
-                    int block_diff = center.Simplified_blocks.Count;
+                    var new_set = new HashSet<Position>(center.Simplified_blocks);
+                    new_set.ExceptWith(units[i].Simplified_blocks);
+                    int block_diff = new_set.Count;
                     if (mine_diff == block_diff)
                     {
-                        foreach (Position p in center.Simplified_blocks)
+                        foreach (Position p in new_set)
                         {
                             if (hint_mode)
                                 ShowAnimation(p.x, p.y);
@@ -314,14 +356,9 @@ namespace MineSweeper
                         }
                         return true;
                     }
-                    else
-                    {
-                        center.Simplified_blocks.UnionWith(units[i].Simplified_blocks);
-                    }
 
                 }
             }
-
 
             return false;
         }
@@ -362,16 +399,9 @@ namespace MineSweeper
                         }
                         else
                         {
-                            if (mines[p.x, p.y].mine_count != 0)
-                            {
-                                if (openBlock(p.x, p.y))
-                                    return true;//win or lose
-                            }
-                            else
-                            {
-                                if (openEmpty(p.x, p.y))
-                                    return true;
-                            }
+                            openBlock(p.x, p.y);
+                            if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                                return true;//win or lose
                         }
 
 
@@ -409,153 +439,119 @@ namespace MineSweeper
                 }
             }
 
-            for (int i = 1; i < units.Count + 1; i++)//get all combination
+
+            if (units.Count == 0)
+                return false;
+            var combinations = GetAllCombination(units);//get all combinatons
+            foreach (List<SolveUnit> set in combinations)
             {
-                Combinations<SolveUnit> combinations = new Combinations<SolveUnit>(units, i);
-                foreach (IList<SolveUnit> set in combinations)                      //for combianation-i set      
+                HashSet<Position> solve = new HashSet<Position> { };
+                int before = 0;
+                int after = 0;
+                int real_mine_count = 0;
+                foreach (SolveUnit su in set)
                 {
-                    HashSet<Position> solve = new HashSet<Position> { };
-                    int before = 0;
-                    int after = 0;
-                    int real_mine_count = 0;
-                    foreach (SolveUnit su in set)
+                    before = solve.Count;
+                    solve.UnionWith(su.Simplified_blocks);//union
+                    after = solve.Count;
+                    if (after - before != su.Simplified_blocks.Count)//intersect not empty
                     {
-                        before = solve.Count;
-                        solve.UnionWith(su.Simplified_blocks);//union
-                        after = solve.Count;
-                        if (after - before != su.Simplified_blocks.Count)//intersect not empty
-                        {
-                            goto end;
-                        }
-                        real_mine_count += su.comfirmed_mine_count;
+                        goto end;
                     }
-                    //CheckSet(solve);
-                    if (solve.IsProperSubsetOf(center.Simplified_blocks))//properset
+                    real_mine_count += su.comfirmed_mine_count;
+                }
+                //CheckSet(solve);
+                if (solve.IsProperSubsetOf(center.Simplified_blocks))//properset
+                {
+                    int block_diff = center.Simplified_blocks.Count - solve.Count;
+                    int mine_diff = center.comfirmed_mine_count - real_mine_count;
+                    //Console.WriteLine("{0} {1}", block_diff, mine_diff);
+                    if (mine_diff == 0)
                     {
-                        int block_diff = center.Simplified_blocks.Count - solve.Count;
-                        int mine_diff = center.comfirmed_mine_count - real_mine_count;
-                        //Console.WriteLine("{0} {1}", block_diff, mine_diff);
-                        if (mine_diff == 0)
+                        center.Simplified_blocks.ExceptWith(solve);
+                        foreach (Position p in center.Simplified_blocks)
                         {
-                            center.Simplified_blocks.ExceptWith(solve);
-                            foreach (Position p in center.Simplified_blocks)
+                            if (hint_mode)
                             {
-                                if (hint_mode)
-                                {
-                                    ShowAnimation(p.x, p.y);
-                                }
-                                else
-                                {
-                                    if (mines[p.x, p.y].mine_count == 0)
-                                    {
-                                        if(openEmpty(p.x, p.y))
-                                            return true;
-                                    }
-
-                                    else
-                                    {
-                                        if (openBlock(p.x, p.y))
-                                            return true;
-                                    }
-                                }
+                                ShowAnimation(p.x, p.y);
                             }
-                            return true;
-                        }
-
-                        if (mine_diff > 0 && mine_diff == block_diff)
-                        {
-                            center.Simplified_blocks.ExceptWith(solve);
-                            //CheckSet(center.Simplified_blocks);
-                            foreach (Position p in center.Simplified_blocks)
+                            else
                             {
-                                if (hint_mode)
-                                    ShowAnimation(p.x, p.y);
-                                else flagBlock(p.x, p.y);
+                                openBlock(p.x, p.y);
+                                if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                                    return true;//win or lose
+
                             }
-                            return true;
                         }
+                        return true;
                     }
 
-                    else if (center.Simplified_blocks.IsProperSubsetOf(solve))//superset
+                    if (mine_diff > 0 && mine_diff == block_diff)
                     {
-                        int block_diff = solve.Count - center.Simplified_blocks.Count;
-                        int mine_diff = real_mine_count - center.comfirmed_mine_count;
-                        //Console.WriteLine("{0} {1}", block_diff, mine_diff);
-                        if (mine_diff == 0)
+                        center.Simplified_blocks.ExceptWith(solve);
+                        //CheckSet(center.Simplified_blocks);
+                        foreach (Position p in center.Simplified_blocks)
                         {
-                            CheckSet(solve);
-                            CheckSet(center.Simplified_blocks);
-                            solve.ExceptWith(center.Simplified_blocks);
-                            foreach (Position p in solve)
-                            {
-                                if (hint_mode)
-                                {
-                                    ShowAnimation(p.x, p.y);
-                                }
-                                else
-                                {
-                                    if (mines[p.x, p.y].mine_count == 0)
-                                    {
-                                        if(openEmpty(p.x, p.y))
-                                        return true;
-                                    }
-
-                                    else
-                                    {
-                                        if (openBlock(p.x, p.y))
-                                            return true;
-                                    }
-                                }
-
-                            }
-                            return true;
+                            if (hint_mode)
+                                ShowAnimation(p.x, p.y);
+                            else flagBlock(p.x, p.y);
                         }
+                        return true;
+                    }
+                }
 
-                        if (mine_diff > 0 && mine_diff == block_diff)
+                else if (center.Simplified_blocks.IsProperSubsetOf(solve))//superset
+                {
+                    int block_diff = solve.Count - center.Simplified_blocks.Count;
+                    int mine_diff = real_mine_count - center.comfirmed_mine_count;
+                    //Console.WriteLine("{0} {1}", block_diff, mine_diff);
+                    if (mine_diff == 0)
+                    {
+                        CheckSet(solve);
+                        CheckSet(center.Simplified_blocks);
+                        solve.ExceptWith(center.Simplified_blocks);
+                        foreach (Position p in solve)
                         {
-                            solve.ExceptWith(center.Simplified_blocks);
-                            //CheckSet(center.Simplified_blocks);
-                            foreach (Position p in solve)
+                            if (hint_mode)
                             {
-                                if (hint_mode)
-                                    ShowAnimation(p.x, p.y);
-                                else flagBlock(p.x, p.y);
+                                ShowAnimation(p.x, p.y);
                             }
-                            return true;
+                            else
+                            {
+                                openBlock(p.x, p.y);
+                                if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                                    return true;//win or lose
+                            }
+
                         }
+                        return true;
                     }
 
-                    else if (!solve.SetEquals(center.Simplified_blocks))//not properset, not equal
+                    if (mine_diff > 0 && mine_diff == block_diff)
                     {
-                        int mine_diff = real_mine_count - center.comfirmed_mine_count;
-                        if (mine_diff > 0)
+                        solve.ExceptWith(center.Simplified_blocks);
+                        //CheckSet(center.Simplified_blocks);
+                        foreach (Position p in solve)
                         {
-                            var new_set = new HashSet<Position>(solve);
-                            new_set.ExceptWith(center.Simplified_blocks);
-                            if (new_set.Count != 0)
-                            {
-                                int block_diff = new_set.Count;
-                                if (block_diff == mine_diff)
-                                {
-                                    foreach (Position p in new_set)
-                                    {
-                                        if (hint_mode)
-                                            ShowAnimation(p.x, p.y);
-                                        else flagBlock(p.x, p.y);
-                                    }
-                                    return true;
-                                }
-
-                            }
+                            if (hint_mode)
+                                ShowAnimation(p.x, p.y);
+                            else flagBlock(p.x, p.y);
                         }
-                        else if (mine_diff < 0)
+                        return true;
+                    }
+                }
+
+                else if (!solve.SetEquals(center.Simplified_blocks))//not properset, not equal
+                {
+                    int mine_diff = real_mine_count - center.comfirmed_mine_count;
+                    if (mine_diff > 0)
+                    {
+                        var new_set = new HashSet<Position>(solve);
+                        new_set.ExceptWith(center.Simplified_blocks);
+                        if (new_set.Count != 0)
                         {
-                            //CheckSet(solve);
-                            //CheckSet(center.Simplified_blocks);
-                            var new_set = new HashSet<Position>(center.Simplified_blocks);
-                            new_set.ExceptWith(solve);
                             int block_diff = new_set.Count;
-                            if (block_diff == -mine_diff)
+                            if (block_diff == mine_diff)
                             {
                                 foreach (Position p in new_set)
                                 {
@@ -565,13 +561,33 @@ namespace MineSweeper
                                 }
                                 return true;
                             }
+
                         }
-
                     }
-                    end:;
-                }
+                    else if (mine_diff < 0)
+                    {
+                        //CheckSet(solve);
+                        //CheckSet(center.Simplified_blocks);
+                        var new_set = new HashSet<Position>(center.Simplified_blocks);
+                        new_set.ExceptWith(solve);
+                        int block_diff = new_set.Count;
+                        if (block_diff == -mine_diff)
+                        {
+                            foreach (Position p in new_set)
+                            {
+                                if (hint_mode)
+                                    ShowAnimation(p.x, p.y);
+                                else flagBlock(p.x, p.y);
+                            }
+                            return true;
+                        }
+                    }
 
+                }
+                end:;
             }
+
+
             return false;
         }
 
@@ -597,8 +613,9 @@ namespace MineSweeper
                     for (int j = 0; j < col; j++)
                     {
                         if (mines[i, j].is_cover && !mines[i, j].is_flag)
-                            if (openBlock(i, j))
-                                return true;
+                            openBlock(i, j);
+                        if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                            return true;//win or lose
                     }
                 }
                 return true;
@@ -628,37 +645,20 @@ namespace MineSweeper
             }
             else
             {
-                if (mines[all_possible[choose].x, all_possible[choose].y].mine_count == 0)
-                {
-                    if (openEmpty(all_possible[choose].x, all_possible[choose].y))
-                        return true;
-                }
+                openBlock(all_possible[choose].x, all_possible[choose].y);
+                if (getGameState() == GameState.Lose || getGameState() == GameState.Win)
+                    return true;//win or lose
 
-                else
-                {
-                    if (openBlock(all_possible[choose].x, all_possible[choose].y))
-                        return true;
-                }
             }
 
-            if (mines[all_possible[choose].x, all_possible[choose].y].is_mine)
-                return true;
+            //if (mines[all_possible[choose].x, all_possible[choose].y].is_mine)
+            //    return true;
 
             return false;
 
         }
 
-        public void SimpleHint(Hint f)
-        {
-            for (int x = 0; x < row; x++)
-            {
-                for (int y = 0; y < col; y++)
-                {
-                    if (!mines[x, y].is_cover && mines[x, y].mine_count != 0 && f(x, y, true))
-                        return;
-                }
-            }
-        }
+
 
         #endregion
 
