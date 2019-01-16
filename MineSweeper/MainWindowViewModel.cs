@@ -159,24 +159,8 @@ namespace MineSweeper
             int x, y;                                     //position
             Mine mine = WhichMine(s, out x, out y);       //FIX LATER
 
-            if (mine.is_cover)
-            {
-                if (mine.is_flag)
-                {
-                    Count_flag -= 1;
-                    Left_mine = (Mine_number - Count_flag).ToString("D3");
-                    mine.is_flag = false;
-                    s.Fill = Brushes.AliceBlue;
-                    //Console.WriteLine(this.Left_mine);
-                }
-                else
-                {
-                    this.Count_flag += 1;
-                    Left_mine = (Mine_number - Count_flag).ToString("D3");
-                    FlagBlock(x, y);
-                    //Console.WriteLine(this.Left_mine);
-                }
-            }
+            FlagBlock(x, y);
+
         }
         #endregion
 
@@ -263,15 +247,30 @@ namespace MineSweeper
 
         public void FlagBlock(int x, int y)//one way, just flag, not include unflag
         {
-            if (Game_state == GameState.Win || Game_state == GameState.Lose)//no move
+            if (!Mines[x, y].is_cover)
                 return;
+            if (!Mines[x, y].is_flag)
+            {
+                Count_flag += 1;
+                Left_mine = (Mine_number - Count_flag).ToString("D3");
 
-            Mines[x, y].is_flag = true;
-            if (test_mode)
-                return;
-            Rectangles[x, y].Fill = BlockBrush.flag;
+                if (Game_state == GameState.Win || Game_state == GameState.Lose)//no move
+                    return;
+
+                Mines[x, y].is_flag = true;
+                if (test_mode)
+                    return;
+                Rectangles[x, y].Fill = BlockBrush.flag;
+            }
+            else
+            {
+                Count_flag -= 1;
+                Left_mine = (Mine_number - Count_flag).ToString("D3");
+                Mines[x, y].is_flag = false;
+                Rectangles[x, y].Fill = Brushes.AliceBlue;
+            }
+
         }
-
         #endregion
 
         #region binding
