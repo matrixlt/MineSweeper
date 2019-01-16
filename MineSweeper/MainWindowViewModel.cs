@@ -62,11 +62,14 @@ namespace MineSweeper
 
         public Record record = null;
 
+        public DependencyProperty PositionProperty;
         #endregion
 
         #region constructor
         public MainWindowViewModel()
         {
+            PositionProperty = DependencyProperty.Register("Position", typeof(Position), typeof(Rectangle));
+
             game = new Game();
             game.Random = random;
             Distribution = game.Generate(16, 30, 99);
@@ -94,6 +97,8 @@ namespace MineSweeper
             player.getGameState = GetGameState;
 
             record = new Record();
+
+            
         }
         #endregion
 
@@ -103,15 +108,15 @@ namespace MineSweeper
             if (both_down)
             {
                 Rectangle s = (Rectangle)sender;
-                int x, y;                                     //position
-                Mine mine = WhichMine(s, out x, out y);       //FIX LATER
+                Position p = (Position)s.GetValue(PositionProperty);
+                Mine mine = Mines[p.x, p.y];       
                 if (mine.is_cover || mine.mine_count == 0)
                     return;
 
                 int flag_count = 0;
-                for (int i = x - 1; i < x + 2; i++)
+                for (int i = p.x - 1; i < p.x + 2; i++)
                 {
-                    for (int j = y - 1; j < y + 2; j++)
+                    for (int j = p.y - 1; j < p.y + 2; j++)
                     {
                         if (InBorder(i, j) && Mines[i, j].is_flag)
                         {
@@ -123,7 +128,7 @@ namespace MineSweeper
                 if (flag_count != mine.mine_count)
                     return;
 
-                LRClick(x, y);
+                LRClick(p.x, p.y);
 
             }
             both_down = false;
@@ -141,25 +146,17 @@ namespace MineSweeper
         private void LClick(object sender, MouseButtonEventArgs e)
         {
 
-
             Rectangle s = (Rectangle)sender;
-            int x, y;                                     //position
-            Mine mine = WhichMine(s, out x, out y);       //FIX LATER
-
-            if (mine.is_flag || !mine.is_cover)
-                return;
-
-            OpenBlock(x, y);
+            Position p =(Position) s.GetValue(PositionProperty);
+            OpenBlock(p.x, p.y);
 
         }
 
         private void RClick(object sender, MouseButtonEventArgs e)
         {
             Rectangle s = (Rectangle)sender;
-            int x, y;                                     //position
-            Mine mine = WhichMine(s, out x, out y);       //FIX LATER
-
-            FlagBlock(x, y);
+            Position p = (Position)s.GetValue(PositionProperty);
+            FlagBlock(p.x, p.y);
 
         }
         #endregion
@@ -167,6 +164,8 @@ namespace MineSweeper
         #region block operation
         public void OpenBlock(int x, int y)
         {
+            if (Mines[x,y].is_flag || !Mines[x, y].is_cover)
+                return;
             if (Game_state == GameState.Win || Game_state == GameState.Lose)//no move
                 return;
             if (first_click)
@@ -446,27 +445,10 @@ namespace MineSweeper
                     myrectangle.PreviewMouseLeftButtonUp += new MouseButtonEventHandler(LClick);
                     myrectangle.PreviewMouseDown += new MouseButtonEventHandler(MouseDown);
                     myrectangle.PreviewMouseUp += new MouseButtonEventHandler(MouseUp);
-
+                    myrectangle.SetValue(PositionProperty, new Position(i, j));
                 }
             }
             BorderSet = newBorderSet;
-        }
-
-        public Mine WhichMine(Rectangle r, out int x, out int y)
-        {
-            for (int i = 0; i < row; i++)
-            {
-                for (int j = 0; j < col; j++)
-                {
-                    if (Object.ReferenceEquals(r, Rectangles[i, j]))
-                    {
-                        x = i;
-                        y = j;
-                        return Mines[i, j];
-                    }
-                }
-            }
-            throw new Exception();
         }
 
         public bool InBorder(int x, int y)
